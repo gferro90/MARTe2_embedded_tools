@@ -1,0 +1,9 @@
+// to be added in main.c to get handles
+
+
+TIM_HandleTypeDef * TIM_Handles[] = { &htim1, NULL, NULL, &htim4, NULL, &htim6, NULL, NULL };
+
+TIM_HandleTypeDef * Get_TIM_Handle(unsigned int number) {
+	return TIM_Handles[number];
+}
+

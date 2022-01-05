@@ -1,0 +1,6 @@
+export SPEC_DEFS=-D_TIM_ADDR=0xF8F00200 -D_CLOCK_FREQ_HZ=666666687
+export ARM_CFLAGS= -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -fmessage-length=0  
+export ARM_LFLAGS= -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,-build-id=none -specs=Xilinx.spec -Wl,--gc-section
+
+#-fno-builtin 
+export LEVEL_1 := ${CURDIR}

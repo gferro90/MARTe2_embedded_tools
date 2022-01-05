@@ -1,0 +1,106 @@
+#############################################################
+#
+# Copyright 2015 F4E | European Joint Undertaking for ITER 
+#  and the Development of Fusion Energy ('Fusion for Energy')
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id: Makefile.inc 3 2012-01-15 16:26:07Z aneto $
+#
+#############################################################
+STM_CUBE_FW_DIR=/home/giuseppe/STM32Cube/Repository/STM32Cube_FW_F4_V1.13.0
+FREE_RTOS_DIRECTORY=$(STM_CUBE_FW_DIR)/Middlewares/Third_Party/FreeRTOS
+PORT_MACRO_H_DIRECTORY=$(STM_CUBE_FW_DIR)/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
+CMSIS_DIRECTORY=$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Include/
+FREE_RTOS_CONFIG_DIRECTORY=$(PROJECT_CONF_INCLUDES)
+
+export ARCHITECTURE_BM_L0Types_DIR=$(MARTe2_DIR)/Source/Core/BareMetal/L0Types/Architecture
+export ARCHITECTURE_BM_L1Portability_DIR=$(MARTe2_DIR)/Source/Core/BareMetal/L1Portability/Architecture
+export ENVIRONMENT_BM_L1Portability_DIR=$(MARTe2_DIR)/Source/Core/BareMetal/L1Portability/Environment
+export ENVIRONMENT_BM_L6App_DIR=$(MARTe2_DIR)/Source/Core/BareMetal/L6App/Environment
+export ENVIRONMENT_FS_L1Portability_DIR=$(MARTe2_DIR)/Source/Core/FileSystem/L1Portability/Environment
+export ENVIRONMENT_SC_L1Portability_DIR=$(MARTe2_DIR)/Source/Core/Scheduler/L1Portability/Environment
+export MARTe2_PORTABLE_ENV_DIR=/home/giuseppe/MARTe2Project/GIT/MARTe2_embedded_tools/Core
+export MARTe2_PORTABLE_ARCH_DIR=/home/giuseppe/MARTe2Project/GIT/MARTe2_embedded_tools/Core
+
+
+
+
+BUILD_DIR=$(MARTe2_Embedded_Tools_DIR_BASE)/Build/$(TARGET)/$(PACKAGE)/$(lastword $(subst /,\ ,$(CURDIR)))
+
+TARGET_PARENT=gcc
+ENVIRONMENT=FreeRTOS
+ARCHITECTURE=arm_cort_m4_stm
+EXEEXT=.bin
+DLLEXT=.so
+LIBEXT=.a
+OBJEXT=.o
+ASMEXT=.s
+DRVEXT=.drv
+GAMEXT=.gam
+GCNOEXT=.gcno
+GCDAEXT=.gcda
+GCOVEXT=.gcov
+HEXEXT=.hex
+LSTEXT=.lst
+SYMEXT=.sym
+ELFEXT=.elf
+
+OBJS0=$(OBJSX:%.x=$(BUILD_DIR)/%.o)
+OBJS1=$(OBJS0:%.x1=$(BUILD_DIR)/%.o)
+OBJS2=$(OBJS1:%.x2=$(BUILD_DIR)/%.o)
+OBJS3=$(OBJS2:%.x3=$(BUILD_DIR)/%.o)
+OBJS=$(OBJ0) $(OBJ1) $(OBJ2) $(OBJS3)
+
+
+SUBPROJ = $(SPB:%.x=%.spb)
+SUBPROJT = $(SPBT:%.x=%.spb)
+SUBPROJGT = $(SPBGT:%.x=%.spb)
+SUBPROJC = $(SPB:%.x=%.sgiuseppe)
+
+CROSS_COMPILER = arm-none-eabi
+COMPILER = $(CROSS_COMPILER)-g++
+CCOMPILER = $(CROSS_COMPILER)-g++
+LINKER = $(CROSS_COMPILER)-ld
+OBJCOPY = $(CROSS_COMPILER)-objcopy
+OBJDUMP = $(CROSS_COMPILER)-objdump
+NM = $(COMPILER_BASE)-nm
+MAKE     = make
+
+DEBUG = -g 
+OPTIM = -Os
+
+ARM_INCLUDES=-I$(FREE_RTOS_DIRECTORY)/Source/include -I$(PORT_MACRO_H_DIRECTORY) -I$(FREE_RTOS_CONFIG_DIRECTORY) -I$(CMSIS_DIRECTORY) -I/usr/include/c++/4.8 -I/usr/include/newlib/c++/4.9/arm-none-eabi/armv7-m/
+ARM_CFLAGS= -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mlittle-endian -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -fpermissive
+ARM_LFLAGS= -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mlittle-endian -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -lm -lgcc -lc -lnosys -specs=nosys.specs -Wl,--gc-section -g
+
+INCLUDES=$(ARM_INCLUDES)
+
+
+CFLAGS = -MD -MP -g -Wall $(ARM_CFLAGS)
+LFLAGS =  $(ARM_LFLAGS)
+
+CPPFLAGS = $(CFLAGS) 
+
+CFLAGSPEC= -DARCHITECTURE=$(ARCHITECTURE) -DENVIRONMENT=$(ENVIRONMENT) $(SPEC_DEFS) -D_ARCHITECTURE_BM_L0Types_DIR=$(ARCHITECTURE_BM_L0Types_DIR) -D_MARTe2_DIR=$(MARTe2_DIR) -DMARTe2_PORTABLE_ARCH_DIR=$(MARTe2_PORTABLE_ARCH_DIR) -DMARTe2_PORTABLE_ENV_DIR=$(MARTe2_PORTABLE_ENV_DIR)
+  
+.SUFFIXES:   .c  .cpp  .o .a .exe .ex .ex_ .so .gam
+
+
+#LFLAGS =-mcpu=cortex-m7 -mthumb -mfpu=fpv5-sp-d16 -mfloat-abi=hard -falign-functions=16 -lm -lgcc -lc -lnosys -specs=nosys.specs -Wl,--gc-section -g 
+#CFLAGS =  -DSTM32F746xx -MD -MP -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mlittle-endian -mthumb -mthumb-interwork -fno-builtin -ffunction-sections -fdata-sections -g -Wall 

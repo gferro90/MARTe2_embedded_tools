@@ -1,0 +1,8 @@
+#-include $(LEVEL_1)/PlatformDefinitions
+DIR := ${CURDIR}
+export PROJECT_CONF_INCLUDES = -I$(DIR)/$(PROJECT_NAME)_hw -I$(DIR)/$(PROJECT_NAME)_app/src -I$(DIR)/$(PROJECT_NAME)_app_bsp/ps7_cortexa9_0/include
+export SPEC_LIBS=-Wl,--start-group,-lxil,-lgcc,-lc,--end-group -Wl,--start-group,-lxil,-llwip4,-lgcc,-lc,--end-group -Wl,--start-group,-lxilffs,-lxil,-lgcc,-lc,--end-group
+export ARM_LFLAGS+=-L$(PROJECT_DIR)/$(PROJECT_NAME)_app_bsp/ps7_cortexa9_0/lib 
+export SPEC_DEFS+= -DLWIP_DHCP=0 
+export LEVEL_2 := ${CURDIR}
+

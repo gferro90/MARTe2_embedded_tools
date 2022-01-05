@@ -1,0 +1,83 @@
+#############################################################
+#
+# Copyright 2015 F4E | European Joint Undertaking for ITER 
+#  and the Development of Fusion Energy ('Fusion for Energy')
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id: Makefile.inc 3 2012-01-15 16:26:07Z aneto $
+#
+#############################################################
+
+
+OBJSX=	startup_main.x
+
+export MARTe2_DIR=/home/pc/MARTe2Project/GIT/MARTe2
+export ROOT_DIR=/home/pc/MARTe2Project/GIT/MARTe2_embedded_tools
+export MAKEDEFAULTDIR=$(ROOT_DIR)/MakeDefaults
+export MARTe2_Components_DIR=/home/pc/MARTe2Project/GIT/MARTe2-components
+export TARGET=arm_cort_m7_stm
+
+export PROJECT_NAME=TimerDataSource_demo
+export TARGET=arm_cort_m7_stm
+export PLATFORM_FAMILY1=STM32
+export PLATFORM_FAMILY2=F7
+export PLATFORM_NAME=STM32F746ZGT-nucleo
+export DRIVER_PLATFORM=STM32F7xx
+export SPEC_DEFS= -DSTM32F746xx -DSTM32746ZG_Nucleo -DUSE_FREERTOS -D_HAL_H="stm32f7xx_hal.h" -D__TIMER__NAME__=TIM6 -D_UART_HANDLE_ERR=huart4 -D_UPLOAD_CFG 
+#-DconfigCHECK_FOR_STACK_OVERFLOW=1 -DINCLUDE_uxTaskGetStackHighWaterMark=1 -D_UPLOAD_CFG 
+export SCRIPT_DIR=$(PWD)/STM32/Scripts
+export CODE_DIR=$(PWD)/STM32
+export PLATFORM_FAMILY=$(PLATFORM_FAMILY1)/Platforms/$(PLATFORM_FAMILY2)
+PLATFORM_DIR=$(PLATFORM_FAMILY)/$(PLATFORM_NAME)
+export PROJECT_DIR=${CURDIR}/$(PLATFORM_DIR)/Demos/$(PROJECT_NAME)
+PROJECT_CONF_INCLUDES=
+CFG_FILE=$(SCRIPT_DIR)/CfgUploader.cfg
+#CFG_FILE=$(PROJECT_DIR)/Configuration/Test1.cfg
+export SCHEDULER_DIR=$(CODE_DIR)/Scheduler
+SCHEDULER_NAME = BasicScheduler
+	
+		
+SPB = $(PROJECT_DIR).x
+
+MAKEDEFAULTDIR=$(ROOT_DIR)/MakeDefaults
+include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
+BUILD_DIR=$(PROJECT_DIR)/Build
+CFLAGS += -D__SCHEDULER__=$(SCHEDULER_NAME)
+CFLAGS += -D__CFG__FILE__=$(CFG_FILE)
+CPPFLAGS += $(CPP_DEFS)
+INCLUDES += -I$(SCHEDULER_DIR) 
+INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L0Types/
+INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L0Types/
+INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L1Portability/
+INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L2Objects/
+INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L3Streams/
+INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L4Configuration/
+INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L4Messages/
+INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L5GAMs/
+INCLUDES += -I$(MARTe2_DIR)/Source/Core/Scheduler/L1Portability/
+INCLUDES += -I$(CODE_DIR)/Scheduler
+INCLUDES += -I$(CODE_DIR)/CfgUploader/
+INCLUDES += -I$(ENVIRONMENT_BM_L1Portability_DIR)/$(ENVIRONMENT)
+INCLUDES += -I$(CODE_DIR)/Streams/StreamParent
+
+all: $(OBJS) $(SUBPROJ) 
+	echo  $(OBJS)
+
+include $(MAKEDEFAULTDIR)/MakeStdLibRules.$(TARGET)
+

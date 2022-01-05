@@ -1,0 +1,106 @@
+#############################################################
+#
+# Copyright 2015 EFDA | European Joint Undertaking for ITER
+# and the Development of Fusion Energy ("Fusion for Energy")
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+
+ARCHITECTURE_BM_L0Types_DIR=$(ROOT_DIR)/Core/BareMetal/L0Types/Architecture
+ARCHITECTURE_BM_L1Portability_DIR=$(ROOT_DIR)/Core/BareMetal/L1Portability/Architecture
+
+BUILD_DIR=$(ROOT_DIR)/Build/$(TARGET)/$(PACKAGE)/$(lastword $(subst /,\ ,$(CURDIR)))
+
+#The name of the parent target (i.e. the Makefiles that use this definition are Makefile.gcc)
+
+TARGET_PARENT=gcc
+ENVIRONMENT=Linux
+ARCHITECTURE=armv8_rpi3
+
+EXEEXT=.ex
+DLLEXT=.so
+LIBEXT=.a
+OBJEXT=.o
+ASMEXT=.s
+DRVEXT=.drv
+GAMEXT=.gam
+GCNOEXT=.gcno
+GCDAEXT=.gcda
+GCOVEXT=.gcov
+DEFEXT=.def
+
+OBJS=   $(OBJSX:%.x=$(BUILD_DIR)/%.o) 
+OBJS2=  $(OBJSX2:%.x=$(BUILD_DIR)/%.o) 
+OBJS3=  $(OBJSX3:%.x=$(BUILD_DIR)/%.o) 
+
+SUBPROJ = $(SPB:%.x=%.spb)
+SUBPROJC = $(SPB:%.x=%.spc)
+SUBPROJ2 = $(SPB2:%.x=%.spb)
+SUBPROJC += $(SPB2:%.x=%.spc)
+
+COMPILER = g++
+CCOMPILER = gcc
+MAKE = make
+
+DEBUG = -g -ggdb
+OPTIM = 
+INCLUDE =
+LFLAGS = -Wl,--no-as-needed -fPIC
+CFLAGS = -fPIC -Wall -Wall -std=c++98 -Wno-invalid-offsetof
+CPPFLAGS = -fPIC -frtti -Wall -std=c++98 -Wno-invalid-offsetof
+
+ifndef ARCHITECTURE_BM_L0Types_DIR
+	 ARCHITECTURE_BM_L0Types_DIR = Architecture
+endif
+ifndef ARCHITECTURE_BM_L1Portability_DIR
+	 ARCHITECTURE_BM_L1Portability_DIR = Architecture
+endif
+ifndef ENVIRONMENT_BM_L1Portability_DIR
+	 ENVIRONMENT_BM_L1Portability_DIR = Environment
+endif
+ifndef ENVIRONMENT_BM_L6App_DIR
+	 ENVIRONMENT_BM_L6App_DIR = Environment
+endif
+ifndef ENVIRONMENT_FS_L1Portability_DIR
+	 ENVIRONMENT_FS_L1Portability_DIR = Environment
+endif
+ifndef ENVIRONMENT_FS_L6App_DIR
+	 ENVIRONMENT_FS_L6App_DIR = Environment
+endif
+ifndef ENVIRONMENT_SC_L1Portability_DIR
+	 ENVIRONMENT_SC_L1Portability_DIR = Environment
+endif
+
+CFLAGSPEC= -DARCHITECTURE=$(ARCHITECTURE) -DENVIRONMENT=$(ENVIRONMENT) $(SPEC_DEFS) -DUSE_PTHREAD -pthread -D_MARTe2_DIR=$(MARTe2_DIR) -D_ARCHITECTURE_BM_L0Types_DIR=$(ARCHITECTURE_BM_L0Types_DIR)\
+	-D_ARCHITECTURE_BM_L1Portability_DIR=$(ARCHITECTURE_BM_L1Portability_DIR)\
+	-D_ENVIRONMENT_BM_L1Portability_DIR=$(ENVIRONMENT_BM_L1Portability_DIR)\
+	-D_ENVIRONMENT_BM_L6App_DIR=$(ENVIRONMENT_BM_L6App_DIR)\
+	-D_ENVIRONMENT_FS_L1Portability_DIR=$(ENVIRONMENT_FS_L1Portability_DIR)\
+	-D_ENVIRONMENT_FS_L6App_DIR=$(ENVIRONMENT_FS_L6App_DIR)\
+	-D_ENVIRONMENT_FS_L6App_DIR=$(ENVIRONMENT_FS_L6App_DIR)\
+	-D_ENVIRONMENT_SC_L1Portability_DIR=$(ENVIRONMENT_SC_L1Portability_DIR)
+	
+	
+	
+
+
+LIBRARIES =  -lm -lnsl -lpthread -lrt -lncurses -ldl
+.SUFFIXES:   .c  .cpp  .o .a .exe .ex .ex_ .so .gam

@@ -1,0 +1,5 @@
+UART_HandleTypeDef * UART_Handles[] = { NULL, NULL, NULL, &huart4, NULL, NULL };
+
+UART_HandleTypeDef * Get_UART_Handle(unsigned int number) {
+	return UART_Handles[number];
+}

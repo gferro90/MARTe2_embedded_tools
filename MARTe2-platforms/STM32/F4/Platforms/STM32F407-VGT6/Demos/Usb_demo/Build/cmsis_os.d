@@ -1,0 +1,104 @@
+../Build/cmsis_os.o: cmsis_os.c \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/string.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/_ansi.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/newlib.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/_newlib_version.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/config.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/machine/ieeefp.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/features.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/reent.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/_ansi.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/lib/gcc/arm-none-eabi/5.4.1/include/stddef.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/_types.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/machine/_types.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/machine/_default_types.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/lock.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/cdefs.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/_locale.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/string.h \
+ cmsis_os.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/lib/gcc/arm-none-eabi/5.4.1/include/stdint.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/stdint.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/_intsup.h \
+ /usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/_stdint.h \
+ /home/pc/STM32Cube/Repository/STM32Cube_FW_F4_V1.13.0/Drivers/CMSIS/Include/core_cmFunc.h \
+ /home/pc/STM32Cube/Repository/STM32Cube_FW_F4_V1.13.0/Drivers/CMSIS/Include/cmsis_gcc.h \
+ FreeRTOS.h FreeRTOSConfig.h mxconstants.h projdefs.h portable.h \
+ deprecated_definitions.h portmacro.h mpu_wrappers.h task.h list.h \
+ timers.h queue.h semphr.h event_groups.h
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/string.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/_ansi.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/newlib.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/_newlib_version.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/config.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/machine/ieeefp.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/features.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/reent.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/_ansi.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/lib/gcc/arm-none-eabi/5.4.1/include/stddef.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/_types.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/machine/_types.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/machine/_default_types.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/lock.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/cdefs.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/_locale.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/string.h:
+
+cmsis_os.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/lib/gcc/arm-none-eabi/5.4.1/include/stdint.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/stdint.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/_intsup.h:
+
+/usr/local/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/_stdint.h:
+
+/home/pc/STM32Cube/Repository/STM32Cube_FW_F4_V1.13.0/Drivers/CMSIS/Include/core_cmFunc.h:
+
+/home/pc/STM32Cube/Repository/STM32Cube_FW_F4_V1.13.0/Drivers/CMSIS/Include/cmsis_gcc.h:
+
+FreeRTOS.h:
+
+FreeRTOSConfig.h:
+
+mxconstants.h:
+
+projdefs.h:
+
+portable.h:
+
+deprecated_definitions.h:
+
+portmacro.h:
+
+mpu_wrappers.h:
+
+task.h:
+
+list.h:
+
+timers.h:
+
+queue.h:
+
+semphr.h:
+
+event_groups.h:

@@ -1,0 +1,8 @@
+// to be added in main.c to get handles
+
+
+
+void * GetHandle(const char *id) {
+	return &htim2;
+}
+

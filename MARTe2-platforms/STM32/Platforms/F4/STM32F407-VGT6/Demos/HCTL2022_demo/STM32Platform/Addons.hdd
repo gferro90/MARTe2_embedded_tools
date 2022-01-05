@@ -1,0 +1,27 @@
+// to be added in main.c to get handles
+
+
+struct x{
+	const char* id;
+	void* handle;
+};
+
+
+static const struct x handles[] ={
+{"GPIOD", GPIOD},
+{"GPIOC", GPIOC},
+{"TIM4", &htim4},
+{0,0}
+};
+
+void * GetHandle(const char *id) {
+	int i=0;
+	while(handles[i].handle){
+		if(strcmp(id,handles[i].id)==0){
+			return handles[i].handle;
+		} 
+		i++;
+	}
+	return 0;
+}
+

@@ -1,0 +1,29 @@
+// to be added in main.c to get handles
+
+UART_HandleTypeDef *errorUartHandle = &huart4;
+
+struct identifier{
+	const char *id;
+	void *handle;
+};
+
+
+const struct identifier ids[]={
+	{"TIM6", &htim6},
+	{"UART4", &huart4},
+	{0,0}
+}; 
+
+
+void *GetHandle(const char *id){
+	int i=0;
+	while(ids[i].id!=NULL){
+		if(strcmp(ids[i].id, id)==0){
+			return ids[i].handle;
+		}
+		i++;
+	}
+	return 0;
+}
+
+

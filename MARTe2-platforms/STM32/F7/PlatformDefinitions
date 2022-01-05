@@ -1,0 +1,12 @@
+export STM_CUBE_FW_DIR=/home/pc/STM32Cube/Repository/STM32Cube_FW_F7_V1.4.0
+export FREE_RTOS_DIRECTORY=$(STM_CUBE_FW_DIR)/Middlewares/Third_Party/FreeRTOS
+export PORT_MACRO_H_DIRECTORY=$(STM_CUBE_FW_DIR)/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/r0p1
+export CMSIS_DIRECTORY=$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Include/
+export FREE_RTOS_CONFIG_DIRECTORY=/home/pc/MARTe2Project/GIT/MARTe2-hw-testing/MARTe2-platforms/STM32/$(PLATFORM_FAMILY)/Platforms/$(PLATFORM_NAME)/Demos/$(PROJECT_NAME)/STM32Platform
+export DRIVER_PLATFORM=STM32F7xx
+export ARM_INCLUDES=-I$(FREE_RTOS_DIRECTORY)/Source/include -I$(PORT_MACRO_H_DIRECTORY) -I$(FREE_RTOS_CONFIG_DIRECTORY) -I$(CMSIS_DIRECTORY) -I/usr/include/c++/4.8 -I/usr/include/newlib/c++/4.9/arm-none-eabi/armv7-m/
+export SPEC_DEFS= -DSTM32F746xx -DSTM32746ZG_Nucleo -DUSE_FREERTOS -D_HAL_H=stm32f7xx_hal.h
+export ARM_CFLAGS=-mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=softfp -mlittle-endian -mthumb -mthumb-interwork -ffunction-sections -fdata-sections  
+export ARM_LFLAGS=-mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=softfp -mthumb -falign-functions=16 -lm -lgcc -lc -lnosys -specs=nosys.specs -Wl,--gc-section -g 
+#-fno-builtin 
+export LEVEL_1 := ${CURDIR}

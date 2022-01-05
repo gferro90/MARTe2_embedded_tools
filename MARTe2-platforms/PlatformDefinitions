@@ -1,0 +1,28 @@
+export PROJECT_NAME=TimerDataSource_demo
+export MARTe2_DIR=/home/pc/MARTe2Project/GIT/MARTe2
+export MARTe2_Components_DIR=/home/pc/MARTe2Project/GIT/MARTe2-components
+export TARGET=arm_cort_m4_stm
+export PLATFORM_FAMILY1=STM32
+export PLATFORM_FAMILY2=F4
+export PLATFORM_NAME=STM32F407-VGT6
+export DRIVER_PLATFORM=STM32F4xx
+export SPEC_DEFS= -DSTM32F407xx -DSTM32F4_Discovery -DUSE_FREERTOS -D_HAL_H="stm32f4xx_hal.h" -D__TIMER__NAME__=TIM6 -D__TIMER__NAME__=TIM6 -D_UART_HANDLE_ERR=huart4 -D_UPLOAD_CFG 
+#-DconfigCHECK_FOR_STACK_OVERFLOW=1 -DINCLUDE_uxTaskGetStackHighWaterMark=1 -D_UPLOAD_CFG 
+
+export SCRIPT_DIR=$(PWD)/STM32/Scripts
+export CODE_DIR=$(PWD)/STM32
+export PLATFORM_FAMILY=$(PLATFORM_FAMILY1)/Platforms/$(PLATFORM_FAMILY2)
+PLATFORM_DIR=$(PLATFORM_FAMILY)/$(PLATFORM_NAME)
+export PROJECT_DIR=${CURDIR}/$(PLATFORM_DIR)/Demos/$(PROJECT_NAME)
+PROJECT_CONF_INCLUDES=
+CFG_FILE=$(SCRIPT_DIR)/CfgUploader.cfg
+export SCHEDULER_DIR=$(CODE_DIR)/Scheduler
+SCHEDULER_NAME = BasicScheduler
+
+export MAIN_DIR := ${CURDIR}
+export LEVEL_O := ${CURDIR}
+export LEVEL_1 := ${CURDIR}/$(PLATFORM_FAMILY)
+#includes all the flags and the path of the drivers for specific platforms
+-include $(LEVEL_1)/PlatformDefinitions
+
+

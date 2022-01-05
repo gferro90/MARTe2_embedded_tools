@@ -1,0 +1,9 @@
+// to be added in main.c to get handles
+
+
+UART_HandleTypeDef *errorUartHandle = &huart4;
+
+void * GetHandle(const char *id) {
+	return &htim6;
+}
+
