@@ -27,7 +27,7 @@ STM_CUBE_FW_DIR=/home/giuseppe/STM32Cube/Repository/STM32Cube_FW_F4_V1.13.0
 FREE_RTOS_DIRECTORY=$(STM_CUBE_FW_DIR)/Middlewares/Third_Party/FreeRTOS
 PORT_MACRO_H_DIRECTORY=$(STM_CUBE_FW_DIR)/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
 CMSIS_DIRECTORY=$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Include/
-FREE_RTOS_CONFIG_DIRECTORY=$(PROJECT_CONF_INCLUDES)
+FREE_RTOS_CONFIG_DIRECTORY?=$(MARTe2_Embedded_Tools_DIR_BASE)/Core/BareMetal/L1Portability/Environment/FreeRTOS
 
 export ARCHITECTURE_BM_L0Types_DIR=$(MARTe2_DIR)/Source/Core/BareMetal/L0Types/Architecture
 export ARCHITECTURE_BM_L1Portability_DIR=$(MARTe2_DIR)/Source/Core/BareMetal/L1Portability/Architecture
@@ -37,9 +37,6 @@ export ENVIRONMENT_FS_L1Portability_DIR=$(MARTe2_DIR)/Source/Core/FileSystem/L1P
 export ENVIRONMENT_SC_L1Portability_DIR=$(MARTe2_DIR)/Source/Core/Scheduler/L1Portability/Environment
 export MARTe2_PORTABLE_ENV_DIR=$(MARTe2_Embedded_Tools_DIR_BASE)/Core
 export MARTe2_PORTABLE_ARCH_DIR=$(MARTe2_Embedded_Tools_DIR_BASE)/Core
-
-
-
 
 BUILD_DIR=$(MARTe2_Embedded_Tools_DIR_BASE)/Build/$(TARGET)/$(PACKAGE)/$(lastword $(subst /,\ ,$(CURDIR)))
 
@@ -71,7 +68,7 @@ OBJS=$(OBJ0) $(OBJ1) $(OBJ2) $(OBJS3)
 SUBPROJ = $(SPB:%.x=%.spb)
 SUBPROJT = $(SPBT:%.x=%.spb)
 SUBPROJGT = $(SPBGT:%.x=%.spb)
-SUBPROJC = $(SPB:%.x=%.spb)
+SUBPROJC = $(SPB:%.x=%.spc)
 
 CROSS_COMPILER = arm-none-eabi
 COMPILER = $(CROSS_COMPILER)-g++

@@ -55,7 +55,7 @@ all: update \
 	copy_startup
 
 update:
-	./update.sh
+	./patch.sh
 	
 copy_startup:
 	cp startup*.s ../

@@ -96,7 +96,33 @@ If necessary, make changes to the configuration and then generate the code.
 
 ###Build MARTe2 
 
-Change the paths accordingly to your environment
+In the template project folder, check and eventually change paths and variables accordingly to the environment;
+
+```shell
+$ cd STM32F4_EmbeddedProject/MARTe
+$ vim PlatformDefinitions.sh
+
+export MARTe2_DIR=/home/giuseppe/MARTe2Project/GIT/MARTe2
+export MARTe2_Embedded_Tools_DIR_BASE=/home/giuseppe/MARTe2Project/GIT/MARTe2_embedded_tools
+export MARTe2_Embedded_Tools_DIR=$MARTe2_Embedded_Tools_DIR_BASE/MARTe2-platforms/STM32
+export MARTe2_Components_DIR=/home/pc/MARTe2Project/GIT/MARTe2-components
+export TARGET=arm_cort_m4_stm
+export SPEC_DEFS='-DSTM32F407xx -DSTM32F4_Discovery -DUSE_FREERTOS -D_HAL_H="stm32f4xx_hal.h" -D__TIMER__NAME__=TIM6 -D__TIMER__NAME__=TIM6 -D_UART_HANDLE_ERR=huart2 -DERROR_ON_USB'
+export SCRIPT_DIR=$MARTe2_Embedded_Tools_DIR/Scripts/STM32F4
+export SCHEDULER_DIR=$MARTe2_Embedded_Tools_DIR/Scheduler
+export PROJECT_NAME=STM32_Config
+export PROJECT_DIR=$PWD
+export PROJECT_CONF_INCLUDES=$PWD/ToolConfiguration
+export DRIVER_PLATFORM=STM32F4xx
+export LINKER_LD_FILE=$PWD/stm32_flash.ld
+cp $PROJECT_CONF_INCLUDES/$PROJECT_NAME/Inc/FreeRTOSConfig.h $PROJECT_CONF_INCLUDES
+cp $PROJECT_CONF_INCLUDES/$PROJECT_NAME/Inc/mxconstants.h $PROJECT_CONF_INCLUDES
+export FREE_RTOS_CONFIG_DIRECTORY=$PROJECT_CONF_INCLUDES
+
+$ source PlatformDefinitions.sh
+```
+
+In the MARTe_embedded_tools folder, change the paths accordingly to your environment
 
 ```shell
 $ cd MARTe_embedded_tools
@@ -117,7 +143,7 @@ STM_CUBE_FW_DIR=/home/giuseppe/STM32Cube/Repository/STM32Cube_FW_F4_V1.13.0
 FREE_RTOS_DIRECTORY=$(STM_CUBE_FW_DIR)/Middlewares/Third_Party/FreeRTOS
 PORT_MACRO_H_DIRECTORY=$(STM_CUBE_FW_DIR)/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
 CMSIS_DIRECTORY=$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Include/
-FREE_RTOS_CONFIG_DIRECTORY=$(PROJECT_CONF_INCLUDES)
+FREE_RTOS_CONFIG_DIRECTORY?=$(MARTe2_Embedded_Tools_DIR_BASE)/Core/BareMetal/L1Portability/Environment/FreeRTOS
 
 export ARCHITECTURE_BM_L0Types_DIR=$(MARTe2_DIR)/Source/Core/BareMetal/L0Types/Architecture
 export ARCHITECTURE_BM_L1Portability_DIR=$(MARTe2_DIR)/Source/Core/BareMetal/L1Portability/Architecture
@@ -138,27 +164,6 @@ $ cd Core
 $ make -f Makefile.arm_cort_m4_stm
 ```
 ###Build The project 
-
-Check and eventually change paths and variables accordingly to your environment;
-
-```shell
-$ cd STM32F4_EmbeddedProject/MARTe
-$ vim PlatformDefinitions.sh
-
-export MARTe2_DIR=/home/giuseppe/MARTe2Project/GIT/MARTe2
-export MARTe2_Embedded_Tools_DIR_BASE=/home/giuseppe/MARTe2Project/GIT/MARTe2_embedded_tools
-export MARTe2_Embedded_Tools_DIR=$MARTe2_Embedded_Tools_DIR_BASE/MARTe2-platforms/STM32
-export MARTe2_Components_DIR=/home/pc/MARTe2Project/GIT/MARTe2-components
-export TARGET=arm_cort_m4_stm
-export SPEC_DEFS='-DSTM32F407xx -DSTM32F4_Discovery -DUSE_FREERTOS -D_HAL_H="stm32f4xx_hal.h" -D__TIMER__NAME__=TIM6 -D__TIMER__NAME__=TIM6 -D_UART_HANDLE_ERR=huart2 -DERROR_ON_USB'
-export SCRIPT_DIR=$MARTe2_Embedded_Tools_DIR/Scripts/STM32F4
-export SCHEDULER_DIR=$MARTe2_Embedded_Tools_DIR/Scheduler
-export PROJECT_NAME=STM32_Config
-export PROJECT_CONF_INCLUDES=$PWD/ToolConfiguration
-export DRIVER_PLATFORM=STM32F4xx
-export LINKER_LD_FILE=$PWD/stm32_flash.ld
-
-```
 
 Compile the project
 
