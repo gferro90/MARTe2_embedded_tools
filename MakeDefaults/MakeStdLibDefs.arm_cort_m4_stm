@@ -35,8 +35,8 @@ export ENVIRONMENT_BM_L1Portability_DIR=$(MARTe2_DIR)/Source/Core/BareMetal/L1Po
 export ENVIRONMENT_BM_L6App_DIR=$(MARTe2_DIR)/Source/Core/BareMetal/L6App/Environment
 export ENVIRONMENT_FS_L1Portability_DIR=$(MARTe2_DIR)/Source/Core/FileSystem/L1Portability/Environment
 export ENVIRONMENT_SC_L1Portability_DIR=$(MARTe2_DIR)/Source/Core/Scheduler/L1Portability/Environment
-export MARTe2_PORTABLE_ENV_DIR=/home/giuseppe/MARTe2Project/GIT/MARTe2_embedded_tools/Core
-export MARTe2_PORTABLE_ARCH_DIR=/home/giuseppe/MARTe2Project/GIT/MARTe2_embedded_tools/Core
+export MARTe2_PORTABLE_ENV_DIR=$(MARTe2_Embedded_Tools_DIR_BASE)/Core
+export MARTe2_PORTABLE_ARCH_DIR=$(MARTe2_Embedded_Tools_DIR_BASE)/Core
 
 
 
@@ -71,7 +71,7 @@ OBJS=$(OBJ0) $(OBJ1) $(OBJ2) $(OBJS3)
 SUBPROJ = $(SPB:%.x=%.spb)
 SUBPROJT = $(SPBT:%.x=%.spb)
 SUBPROJGT = $(SPBGT:%.x=%.spb)
-SUBPROJC = $(SPB:%.x=%.sgiuseppe)
+SUBPROJC = $(SPB:%.x=%.spb)
 
 CROSS_COMPILER = arm-none-eabi
 COMPILER = $(CROSS_COMPILER)-g++

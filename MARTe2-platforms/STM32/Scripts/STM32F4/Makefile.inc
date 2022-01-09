@@ -39,8 +39,8 @@ BUILD_DIR=../Build
 
 INCLUDES += -I.
 INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Include/
-INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/STM32F4xx_HAL_Driver/Inc/
-INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Device/ST/STM32F4xx/Include/
+INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/$(DRIVER_PLATFORM)_HAL_Driver/Inc/
+INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Device/ST/$(DRIVER_PLATFORM)/Include/
 INCLUDES += -I$(SCHEDULER_DIR)
 
 
@@ -55,7 +55,6 @@ all: update \
 	copy_startup
 
 update:
-	ls stm32f4xx.h || python3 STM32ExtractFiles.py $(PROJECT_NAME) $(PROJECT_NAME) .
 	./update.sh
 	
 copy_startup:
