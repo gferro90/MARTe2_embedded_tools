@@ -1,6 +1,6 @@
-#User Manual
+# User Manual
 
-###Preparation
+### Preparation
 
 Download **MARTe2** and switch to *develop* branch which is usually the last stable release.
 
@@ -82,7 +82,7 @@ Download **STM32CubeMX** from [STM32CubeMX](https://www.st.com/en/development-to
 Download **st-link** (to flash the binary) from [st-link](https://www.st.com/en/development-tools/stsw-link004.html)
 
 
-###Project code generation
+### Project code generation
 
 Open STM32CubeMX and load the template project in *STM32F4_EmbeddedProject/MARTe/ToolConfiguration/STM32_Config/STM32Config.ioc*
 STM32CubeMX will ask if to migrate the project to the last version or if to use the old version of the drivers. Choose to use the old version (it should be V1.13.0) and STM32CubeMX will automatically download the drivers.
@@ -94,7 +94,7 @@ $ ./STM32CubeMX/
 
 If necessary, make changes to the configuration and then generate the code.
 
-###Build MARTe2 
+### Build MARTe2 
 
 In the template project folder, check and eventually change paths and variables accordingly to the environment;
 
@@ -163,7 +163,8 @@ Compile the MARTe2 libraries for STM32F4
 $ cd Core
 $ make -f Makefile.arm_cort_m4_stm
 ```
-###Build The project 
+
+### Build The project 
 
 Compile the project
 
@@ -177,6 +178,9 @@ load the binary on the STM board
 $ cd Build
 $ ./loader.sh
 ```
+
+### Video Tutorial 
+https://raw.githubusercontent.com/gferro90/MARTe2_embedded_tools/main/Documentation/Tutorial.webm
 
 
 
