@@ -164,11 +164,12 @@ $ cd Core
 $ make -f Makefile.arm_cort_m4_stm
 ```
 
-### Build The project 
+### Build the project 
 
 Compile the project
 
 ```shell
+$ cd STM32F4_EmbeddedProject/MARTe
 $ make -f Makefile.arm_cort_m4_stm
 ```
 
