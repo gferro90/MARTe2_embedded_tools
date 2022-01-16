@@ -8,7 +8,7 @@
 #ifndef GPIO_GPIOWRITER_H_
 #define GPIO_GPIOWRITER_H_
 #include "MemoryMapInputBroker.h"
-#include "stm32f4xx_hal.h"
+#include QUOTE(_HAL_H)
 
 using namespace MARTe;
 class GPIOWriter : public MemoryMapInputBroker {

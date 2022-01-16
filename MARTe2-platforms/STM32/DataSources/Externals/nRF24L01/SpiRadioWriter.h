@@ -32,7 +32,7 @@
 /*                        Project header includes                            */
 /*---------------------------------------------------------------------------*/
 #include "MemoryMapOutputBroker.h"
-#include "stm32f4xx_hal.h"
+#include QUOTE(_HAL_H)
 
 /*---------------------------------------------------------------------------*/
 /*                           Class declaration                               */

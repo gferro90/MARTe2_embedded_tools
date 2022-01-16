@@ -8,7 +8,7 @@
 #ifndef PWM_PWMWRITER_H_
 #define PWM_PWMWRITER_H_
 #include "MemoryMapInputBroker.h"
-#include "stm32f4xx_hal.h"
+#include QUOTE(_HAL_H)
 
 using namespace MARTe;
 class PWMWriter : public MemoryMapInputBroker {

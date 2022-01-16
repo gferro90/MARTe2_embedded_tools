@@ -32,7 +32,7 @@
 /*                        Project header includes                            */
 /*---------------------------------------------------------------------------*/
 #include "MemoryMapInputBroker.h"
-#include "stm32f4xx_hal.h"
+#include QUOTE(_HAL_H)
 #include "HCTL2022.h"
 
 using namespace MARTe;

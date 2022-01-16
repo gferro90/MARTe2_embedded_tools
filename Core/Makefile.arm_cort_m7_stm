@@ -23,13 +23,13 @@
 # $Id: Makefile.inc 3 2012-01-15 16:26:07Z aneto $
 #
 #############################################################
-export MARTe2_DIR=/home/pc/MARTe2Project/GIT/MARTe2
-export ROOT_DIR=/home/pc/MARTe2Project/GIT/MARTe2_embedded_tools
-export MAKEDEFAULTDIR=$(ROOT_DIR)s/MakeDefaults
-export MARTe2_Components_DIR=/home/pc/MARTe2Project/GIT/MARTe2-components
+export MARTe2_DIR=/home/giuseppe/MARTe2Project/GIT/MARTe2
+export MARTe2_Embedded_Tools_DIR_BASE=/home/giuseppe/MARTe2Project/GIT/MARTe2_embedded_tools
+export MARTe2_MAKEDEFAULT_DIR=$(MARTe2_Embedded_Tools_DIR_BASE)/MakeDefaults
+export MARTe2_Components_DIR=/home/giuseppe/MARTe2Project/GIT/MARTe2-components
 export TARGET=arm_cort_m7_stm
 
-MAKEDEFAULTDIR=$(ROOT_DIR)/MakeDefaults
+MAKEDEFAULTDIR=$(MARTe2_Embedded_Tools_DIR_BASE)/MakeDefaults
 
 OBJSX=
 SPB = $(MARTe2_DIR)/Source/Core/BareMetal.x\
@@ -38,10 +38,10 @@ SPB = $(MARTe2_DIR)/Source/Core/BareMetal.x\
 PACKAGE=
 
 
-LIBRARIES_STATIC += $(ROOT_DIR)/Build/$(TARGET)/Core/BareMetal/MARTeCoreB$(LIBEXT)
-LIBRARIES_STATIC += $(ROOT_DIR)/Build/$(TARGET)/Core/Scheduler/MARTeCoreS$(LIBEXT)
+LIBRARIES_STATIC += $(MARTe2_Embedded_Tools_DIR_BASE)/Build/$(TARGET)/Core/BareMetal/MARTeCoreB$(LIBEXT)
+LIBRARIES_STATIC += $(MARTe2_Embedded_Tools_DIR_BASE)/Build/$(TARGET)/Core/Scheduler/MARTeCoreS$(LIBEXT)
 		
-MAKEDEFAULTDIR=$(ROOT_DIR)/MakeDefaults
+MAKEDEFAULTDIR=$(MARTe2_Embedded_Tools_DIR_BASE)/MakeDefaults
 
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 

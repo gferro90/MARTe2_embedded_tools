@@ -32,7 +32,7 @@
 /*                        Project header includes                            */
 /*---------------------------------------------------------------------------*/
 #include "DataSourceI.h"
-#include "stm32f4xx_hal.h"
+#include QUOTE(_HAL_H)
 #include "nRF24L01+.h"
 /*---------------------------------------------------------------------------*/
 /*                           Class declaration                               */

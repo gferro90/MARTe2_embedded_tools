@@ -9,7 +9,7 @@
 #define PWM_PWMREADER_OPT_H_
 
 #include "MemoryMapInputBroker.h"
-#include "stm32f4xx_hal.h"
+#include QUOTE(_HAL_H)
 
 using namespace MARTe;
 

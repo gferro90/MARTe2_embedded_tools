@@ -66,6 +66,17 @@ LIBRARIES_STATIC+=$(BUILD_DIR)/L5GAMs/L5GAMsS$(LIBEXT)
 
 ```
 
+Change also in MARTe2/Source/Core/Scheduler/L3Services/MultiClientEmbeddedThread.cpp 
+
+```shell
+ information.SetThreadNumber(static_cast<uint32>(threadId));
+```
+to 
+
+```shell
+information.SetThreadNumber((uint32)(threadId));
+```
+
 Download **MARTe2_embedded_tools**
 
 ```shell

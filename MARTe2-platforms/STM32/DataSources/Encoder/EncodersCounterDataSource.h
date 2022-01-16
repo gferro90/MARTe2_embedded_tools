@@ -8,7 +8,7 @@
 #ifndef ENCODERSCOUNTERDATASOURCE_H_
 #define ENCODERSCOUNTERDATASOURCE_H_
 #include "TIMBase.h"
-#include "stm32f4xx_hal.h"
+#include QUOTE(_HAL_H)
 
 using namespace MARTe;
 //TODO The ...GetState() function returns the initialisation handle and we can change parameters and re-initialise.

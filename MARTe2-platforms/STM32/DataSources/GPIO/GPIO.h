@@ -9,7 +9,8 @@
 #define GPIO_GPIODATASOURCE_H_
 
 #include "DataSourceI.h"
-#include "stm32f4xx_hal.h"
+#include QUOTE(_HAL_H)
+
 
 using namespace MARTe;
 
