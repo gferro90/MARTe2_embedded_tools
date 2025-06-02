@@ -23,7 +23,7 @@
 # $Id: Makefile.inc 3 2012-01-15 16:26:07Z aneto $
 #
 #############################################################
-STM_CUBE_FW_DIR=/home/giuseppe/STM32Cube/Repository/STM32Cube_FW_F4_V1.13.0
+STM_CUBE_FW_DIR?=/home/giuseppe/STM32Cube/Repository/STM32Cube_FW_F4_V1.13.0
 FREE_RTOS_DIRECTORY=$(STM_CUBE_FW_DIR)/Middlewares/Third_Party/FreeRTOS
 PORT_MACRO_H_DIRECTORY=$(STM_CUBE_FW_DIR)/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
 CMSIS_DIRECTORY=$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Include/
@@ -83,8 +83,8 @@ DEBUG = -g
 OPTIM = -Os
 
 ARM_INCLUDES=-I$(FREE_RTOS_DIRECTORY)/Source/include -I$(PORT_MACRO_H_DIRECTORY) -I$(FREE_RTOS_CONFIG_DIRECTORY) -I$(CMSIS_DIRECTORY) -I/usr/include/c++/4.8 -I/usr/include/newlib/c++/4.9/arm-none-eabi/armv7-m/
-ARM_CFLAGS= -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mlittle-endian -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -fpermissive
-ARM_LFLAGS= -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mlittle-endian -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -lm -lgcc -lc -lnosys -specs=nosys.specs -Wl,--gc-section -g
+ARM_CFLAGS?= -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mlittle-endian -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -fpermissive
+ARM_LFLAGS?= -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mlittle-endian -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -lm -lgcc -lc -lnosys -specs=nosys.specs -Wl,--gc-section -g
 
 INCLUDES=$(ARM_INCLUDES)
 

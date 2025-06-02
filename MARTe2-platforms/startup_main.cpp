@@ -65,6 +65,7 @@ extern void DebugErrorProcessFunction(
 extern void PrintStack(ThreadIdentifier &tid);
 
 static void MARTeAppLauncher(void const *ignored) {
+    REPORT_ERROR(ErrorManagement::Information, "Hello World!!!");
 
 	uint32 confSize = StringHelper::Length(config) + 1;
 

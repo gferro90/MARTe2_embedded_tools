@@ -9,7 +9,9 @@
 #include "StreamMemoryReference.h"
 #include "task.h"
 #include "MemoryOperationsHelper.h"
+#ifdef ERROR_ON_USB
 #include "usbd_cdc_if.h"
+#endif
 #include QUOTE(_HAL_H)
 
 //#define ERROR_ON_USB
@@ -41,6 +43,22 @@ void PrintStack(ThreadIdentifier &tid) {
         USBWrite(buffer2_stream.Buffer(), &size, 0);
         Sleep::Sec(20.);
     }
+}
+
+void PrintF(const char * const message) {
+//  StackType_t *stackTop=(StackType_t*) xTaskGetCurrentTaskHandle();
+    MemoryOperationsHelper::Set(buffer, 0, 128);
+    StreamMemoryReference buffer_stream(buffer, 128);
+
+    buffer_stream.Seek(0);
+    buffer_stream.Printf("%s\n\r", message);
+
+    uint32_t size = buffer_stream.Size() + 1;
+    if (!USBInitialized()) {
+        USBOpen();
+    }
+    USBWrite(buffer, &size, 0);
+
 }
 
 void DebugErrorProcessFunction(const MARTe::ErrorManagement::ErrorInformation &errorInfo,
@@ -77,6 +95,18 @@ void PrintStack(ThreadIdentifier &tid) {
 
         Sleep::Sec(20.);
     }
+}
+
+void PrintF(const char * const message) {
+//  StackType_t *stackTop=(StackType_t*) xTaskGetCurrentTaskHandle();
+    MemoryOperationsHelper::Set(buffer, 0, 128);
+    StreamMemoryReference buffer_stream(buffer, 128);
+    buffer_stream.Seek(0);
+    buffer_stream.Printf("%s\n\r", message);
+
+    uint32_t size = buffer_stream.Size() + 1;
+    HAL_UART_Transmit(errorUartHandle, (uint8_t*) buffer, size, HAL_MAX_DELAY);
+
 }
 
 void DebugErrorProcessFunction(const MARTe::ErrorManagement::ErrorInformation &errorInfo,

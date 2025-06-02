@@ -72,6 +72,7 @@ INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/$(DRIVER_PLATFORM)_HAL_Driver/Inc/
 INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Device/ST/STM32F7xx/Include/
 INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Include/
 INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/BSP/Components/otm8009a/
+INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/BSP/STM32F7xx_Nucleo_144
 INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/$(DRIVER_PLATFORM)_HAL_Driver/Src/
 
 

@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <string.h>
 
-extern "C" {
 
 struct HandleNode handleDatabase[64];
 unsigned int numberOfHandles=0u;
@@ -24,4 +23,3 @@ void *GetHandle(const char *handleName){
 	return NULL;
 }
 
-}

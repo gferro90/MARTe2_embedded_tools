@@ -76,7 +76,7 @@ SUBPROJC = $(SPB:%.x=%.spc)
 
 CROSS_COMPILER = arm-none-eabi
 COMPILER = $(CROSS_COMPILER)-g++
-CCOMPILER = $(CROSS_COMPILER)-g++
+CCOMPILER = $(CROSS_COMPILER)-gcc
 LINKER = $(CROSS_COMPILER)-ld
 OBJCOPY = $(CROSS_COMPILER)-objcopy
 OBJDUMP = $(CROSS_COMPILER)-objdump
@@ -86,9 +86,9 @@ MAKE     = make
 DEBUG = -g 
 OPTIM = -Os
 
-ARM_INCLUDES=-I$(FREE_RTOS_DIRECTORY)/Source/include -I$(PORT_MACRO_H_DIRECTORY) -I$(FREE_RTOS_CONFIG_DIRECTORY) -I$(FREE_RTOS_DIRECTORY_CMSIS) -I$(CMSIS_DIRECTORY) -I$(USB_DIRECTORY) -I$(LWIP_DIRECTORY) -I$(LWIP_ARCH_DIRECTORY) -I/usr/include/c++/4.8 -I/usr/include/newlib/c++/4.9/arm-none-eabi/armv7-m/
-ARM_CFLAGS= -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=softfp -mlittle-endian -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -fpermissive  
-ARM_LFLAGS= -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=softfp -mthumb -falign-functions=16 -lm -lgcc -lc -lnosys -specs=nosys.specs -Wl,--gc-section -g
+ARM_INCLUDES=-I$(FREE_RTOS_DIRECTORY) -I$(PORT_MACRO_H_DIRECTORY) -I$(FREE_RTOS_CONFIG_DIRECTORY) -I$(FREE_RTOS_DIRECTORY_CMSIS) -I$(CMSIS_DIRECTORY) -I$(USB_DIRECTORY) -I$(LWIP_DIRECTORY) -I$(LWIP_ARCH_DIRECTORY) -I/usr/include/c++/4.8 -I/usr/include/newlib/c++/4.9/arm-none-eabi/armv7-m/
+ARM_CFLAGS?= -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=softfp -mlittle-endian -mthumb -mthumb-interwork -ffunction-sections -fdata-sections
+ARM_LFLAGS?= -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=softfp -mthumb -falign-functions=16 -lm -lgcc -lc -lnosys -specs=nosys.specs -Wl,--gc-section -g
 
 INCLUDES=$(ARM_INCLUDES)
 
