@@ -7,7 +7,7 @@
  
 
 #include "USBCommunicationReader.h"
-#include "usbd_cdc_if.h"
+#include "usbd_cdc_custom.h"
 #include "usb_device.h"
 #include "USBCommunication.h"
 #include "AdvancedErrorManagement.h"

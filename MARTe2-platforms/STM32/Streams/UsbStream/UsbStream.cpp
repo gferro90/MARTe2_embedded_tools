@@ -30,7 +30,7 @@
 /*---------------------------------------------------------------------------*/
 
 #include "UsbStream.h"
-#include "usbd_cdc_if.h"
+#include "usbd_cdc_custom.h"
 
 /*---------------------------------------------------------------------------*/
 /*                           Static definitions                              */
@@ -43,8 +43,8 @@
 UsbStream::UsbStream() {
     if (!USBInitialized()) {
         USBOpen();
-        USBSync();
     }
+    USBSync();
 }
 
 UsbStream::~UsbStream() {

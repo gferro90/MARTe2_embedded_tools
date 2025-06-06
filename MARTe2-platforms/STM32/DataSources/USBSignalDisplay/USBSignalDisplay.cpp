@@ -20,7 +20,7 @@
 #include "MemoryMapOutputBroker.h"
 #include "Threads.h"
 #include "TypeDescriptor.h"
-#include "usbd_cdc_if.h"
+#include "usbd_cdc_custom.h"
 #include "usb_device.h"
 
 /*---------------------------------------------------------------------------*/

@@ -52,6 +52,7 @@ CfgUploader::~CfgUploader() {
 }
 
 bool CfgUploader::Initialise(StructuredDataI &data) {
+    REPORT_ERROR(ErrorManagement::Information, "In Initialise...");
 
     bool ret = ReferenceContainer::Initialise(data);
     if (ret) {
@@ -80,7 +81,7 @@ bool CfgUploader::Initialise(StructuredDataI &data) {
 
 bool CfgUploader::UploadCfg(StreamString &cfgBuffer) {
     //read the initial sequence
-    //REPORT_ERROR(ErrorManagement::Warning, "Reading Initial Sequence...");
+    REPORT_ERROR(ErrorManagement::Information, "In UploadCfg...");
 
     cfgBuffer = "";
     uint32 sizeToRead = packetSize;
@@ -88,7 +89,9 @@ bool CfgUploader::UploadCfg(StreamString &cfgBuffer) {
     bool ret = (buffer != NULL);
     if (ret) {
         MemoryOperationsHelper::Set(buffer, 0, packetSize + 1);
+        REPORT_ERROR(ErrorManagement::Information, "Before Read");
         stream->Read(buffer, sizeToRead, (uint32)(-1));
+        REPORT_ERROR(ErrorManagement::Information, "After Read");
 
         buffer[packetSize] = 0;
         //REPORT_ERROR_PARAMETERS(ErrorManagement::Warning, "Read %d %s", sizeToRead, buffer);
@@ -100,7 +103,9 @@ bool CfgUploader::UploadCfg(StreamString &cfgBuffer) {
                 sizeToRead = packetSize;
                 stream->Read(buffer, sizeToRead, (uint32)(-1));
                 buffer[packetSize] = 0;
-                REPORT_ERROR_PARAMETERS(ErrorManagement::Warning, "Read %d", sizeToRead);
+                REPORT_ERROR(ErrorManagement::Warning, "---------------------");
+                REPORT_ERROR(ErrorManagement::Warning, (const char8 *)buffer);
+                REPORT_ERROR(ErrorManagement::Warning, "---------------------");
 
                 if (finalSequence == buffer) {
                     REPORT_ERROR(ErrorManagement::Warning, "Read Final Sequence");

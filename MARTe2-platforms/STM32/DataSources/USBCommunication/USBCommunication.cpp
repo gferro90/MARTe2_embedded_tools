@@ -10,7 +10,7 @@
 #include "AdvancedErrorManagement.h"
 #include "USBCommunicationReader.h"
 #include "USBCommunicationWriter.h"
-#include "usbd_cdc_if.h"
+#include "usbd_cdc_custom.h"
 
 /*---------------------------------------------------------------------------*/
 /*                           Static definitions                              */

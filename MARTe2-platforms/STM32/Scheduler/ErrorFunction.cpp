@@ -10,7 +10,7 @@
 #include "task.h"
 #include "MemoryOperationsHelper.h"
 #ifdef ERROR_ON_USB
-#include "usbd_cdc_if.h"
+#include "usbd_cdc_custom.h"
 #endif
 #include QUOTE(_HAL_H)
 
