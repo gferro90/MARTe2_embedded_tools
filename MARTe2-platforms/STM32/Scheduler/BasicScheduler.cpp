@@ -35,7 +35,7 @@
 /*---------------------------------------------------------------------------*/
 /*                           Static definitions                              */
 /*---------------------------------------------------------------------------*/
-extern int8 SM_changeState;
+//extern int8 SM_changeState;
 
 /*---------------------------------------------------------------------------*/
 /*                           Method definitions                              */
@@ -55,9 +55,10 @@ bool BasicScheduler::ConfigureScheduler(Reference realTimeAppIn) {
 ErrorManagement::ErrorType BasicScheduler::StartNextStateExecution() {
     ErrorManagement::ErrorType err;
     //while (!SM_changeState) {
+    while (1) {
         //run the first thread
         Cycle(0);
-    //}
+    }
     return err;
 }
 

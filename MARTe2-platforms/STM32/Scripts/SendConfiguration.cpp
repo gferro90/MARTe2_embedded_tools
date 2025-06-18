@@ -56,7 +56,7 @@ int main(int argc,
 
     struct timespec sleepTime;
     sleepTime.tv_sec = 0;
-    sleepTime.tv_nsec = 10000000;
+    sleepTime.tv_nsec = 100000000;
     struct timespec remTime;
 
     const char *devPath=_DEV_PATH;
@@ -175,7 +175,7 @@ int main(int argc,
     nanosleep(&sleepTime, &remTime);
 
     sleepTime.tv_sec = 0;
-    sleepTime.tv_nsec = 100000000;
+    sleepTime.tv_nsec = 200000000;
 
     bool end = false;
     //for (unsigned int index = 0; index < totalSize; index += packetSize) {
@@ -207,6 +207,7 @@ int main(int argc,
         nanosleep(&sleepTime, &remTime);
     }
 
+    nanosleep(&sleepTime, &remTime);
     //write final sequence
     memset(buff, 0, packetSize + 1);
     memcpy(buff, finalSeq, strlen(finalSeq));

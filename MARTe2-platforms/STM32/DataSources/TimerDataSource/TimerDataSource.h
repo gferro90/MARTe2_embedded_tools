@@ -52,6 +52,7 @@ using namespace MARTe;
  * <pre>
  * +Timer = {
  *     Class = TimerDataSource
+ *     Phase = 0 //Phase in us (Default no phase - initial phase)
  *     UseThread = 1 //Use or not the internal thread ad the event semaphore to sync. Default 0 (don't use an internal thread)
  * }
  * </pre>
@@ -72,6 +73,11 @@ public:
     virtual ~TimerDataSource();
 
     /**
+     * @brief User configuration for the Phase.
+     */
+    virtual bool Initialise(StructuredDataI & data);
+
+    /**
      * @brief Waits that the specified period has passed.
      * @see DataSourceI::Synchronise.
      * @details if (UseThread == 1) then it waits on an event semaphore. In this case if the MARTe cycle is too slow, the next synchronisation
@@ -79,27 +85,27 @@ public:
      * it waits until (now-last)<period. This means that if the MARTe cycle is too slow, it returns immediately and the next synchronisation point
      * will be after the time period.
      */
-    bool Synchronise();
+    virtual bool Synchronise();
 
     /**
      * @see DataSourceI::AllocateMemory
      * @details It trivially returns true withoud doing anything
      * @return true
      */
-    bool AllocateMemory();
+    virtual bool AllocateMemory();
 
     /**
      * @see DataSourceI::GetNumberOfMemoryBuffers
      * @details It trivially returns 1.
      * @return 1
      */
-    MARTe::uint32 GetNumberOfMemoryBuffers();
+    virtual MARTe::uint32 GetNumberOfMemoryBuffers();
 
     /**
      * @see DataSourceI::GetSignalMemoryBuffer
      * @details returns the pointer to the internal member that holds the elapsed time in us.
      */
-    bool GetSignalMemoryBuffer(const MARTe::uint32 signalIdx,
+    virtual bool GetSignalMemoryBuffer(const MARTe::uint32 signalIdx,
                                const MARTe::uint32 bufferIdx,
                                void *&signalAddress);
 
@@ -163,7 +169,7 @@ public:
     /**
      * The time period in us
      */
-    uint32 sleepTimeUS;
+    uint32 sleepCounter;
 
     /**
      * The flag that specifies if the synchronisation
@@ -175,7 +181,12 @@ public:
      * Stores the counter if the synchronisation is in polling
      * mode using the high resolution counter.
      */
-    uint64 oldCounter;
+    uint64 targetCounter;
+
+    /**
+     * Phase in us
+     */
+    uint32 phase;
 
 };
 

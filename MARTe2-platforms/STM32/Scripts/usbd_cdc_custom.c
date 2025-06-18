@@ -40,9 +40,12 @@ struct {
 static int8_t CDC_Init_FS_Custom(void) {
     s_RxBuffer.Buffer = UserRxBufferFS;
     memset(UserRxBufferFS, 0, APP_RX_DATA_SIZE);
+    s_RxBuffer.Position = 0;
+    s_RxBuffer.Last = 0;
     /* USER CODE BEGIN 3 */
     /* Set Application Buffers */
     USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, 0);
+    USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS);
     USB_initialised = 1;
     return (USBD_OK);
     /* USER CODE END 3 */
@@ -50,10 +53,7 @@ static int8_t CDC_Init_FS_Custom(void) {
 
 static int8_t CDC_Receive_FS_Custom(uint8_t *Buf, uint32_t *Len) {
     /* USER CODE BEGIN 6 */
-
-    s_RxBuffer.Position = 0;
-    s_RxBuffer.Last += *Len;
-    s_RxBuffer.Last %= APP_RX_DATA_SIZE;
+    s_RxBuffer.Last = *Len;
     s_RxBuffer.IsReadData = 1;
 //  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
 //  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
@@ -85,7 +85,7 @@ void USBOpen() {
     USBD_Start(&hUsbDeviceFS);
 
     while (!USB_initialised) {
-        HAL_Delay(1000);
+        HAL_Delay(1);
     }
 }
 
@@ -146,22 +146,24 @@ int USBWrite(const char *const txBuffer, uint32_t *sizeIn, int8_t nonBlock) {
 static int USBPrivateRead(char *const rxBuffer, uint32_t size) {
 
     // the remained received size to be copied
-    int remaining = (s_RxBuffer.Last >= s_RxBuffer.Position) ? (s_RxBuffer.Last - s_RxBuffer.Position) : ((APP_RX_DATA_SIZE - s_RxBuffer.Position) + s_RxBuffer.Last);
+    int remaining = (s_RxBuffer.Last - s_RxBuffer.Position);
 
     // take the minimum
     int todo = MIN(remaining, (int ) size);
 
     if (todo <= 0) {
-        USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS + s_RxBuffer.Last);
+        s_RxBuffer.IsReadData = 0;
         USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+        while(s_RxBuffer.IsReadData == 0){
+            HAL_Delay(1);
+        }
+        s_RxBuffer.Position = 0;
         return 0;
     }
 
     // copy data to the output buffer.
     memcpy(rxBuffer, s_RxBuffer.Buffer + s_RxBuffer.Position, todo);
     s_RxBuffer.Position += todo;
-    s_RxBuffer.Position %= APP_RX_DATA_SIZE;
-
     return todo;
 }
 
@@ -183,7 +185,7 @@ int USBRead(char *const rxBuffer, uint32_t *sizeIn, int8_t nonBlock) {
 }
 
 int USB_RXBufferSize() {
-    return (s_RxBuffer.Last >= s_RxBuffer.Position) ? (s_RxBuffer.Last - s_RxBuffer.Position) : ((APP_RX_DATA_SIZE - s_RxBuffer.Position) + s_RxBuffer.Last);
+    return (s_RxBuffer.Last - s_RxBuffer.Position);
 }
 
 int USB_RXBufferPosition() {

@@ -26,7 +26,6 @@
 /*---------------------------------------------------------------------------*/
 //#include "stm32f4xx_hal.h"
 
-
 //#include "stm32f4xx_hal_tim.h"
 #include "cmsis_os.h"
 
@@ -37,25 +36,30 @@
 #include "HighResolutionTimerCalibrator.h"
 #include "HighResolutionTimer.h"
 #include "StringHelper.h"
+#include "StreamString.h"
+#include "AdvancedErrorManagement.h"
+
 #include QUOTE(_HAL_H)
 /*---------------------------------------------------------------------------*/
 /*                           Static definitions                              */
 /*---------------------------------------------------------------------------*/
-extern "C"{
+extern "C" {
 void CalibrateTimer() {
-__TIMER__NAME__->CNT = 0;
+    __TIMER__NAME__->CNT = 0;
 }
-extern void *GetHandle(const char*);
+extern void* GetHandle(const char*);
 }
 /*---------------------------------------------------------------------------*/
 /*                           Method definitions                              */
 /*---------------------------------------------------------------------------*/
+extern void PrintF(const char *const message);
+
 namespace MARTe {
 
-HighResolutionTimerCalibrator calibratedHighResolutionTimer;
+static uint64 globalCounter = 0ull;
 
 HighResolutionTimerCalibrator::HighResolutionTimerCalibrator() {
-    frequency = osKernelSysTickFrequency*1000;
+    frequency = osKernelSysTickFrequency * 1000;
     period = 1.0 / frequency;
 }
 
@@ -79,11 +83,15 @@ float64 HighResolutionTimerCalibrator::GetPeriod() const {
 }
 
 uint64 HighResolutionTimerCalibrator::Counter() {
-    return Counter32();
+    uint32 delta = (HAL_GetTick() - (uint32) globalCounter);
+    globalCounter += delta;
+    return (globalCounter * 1000ull) + __TIMER__NAME__->CNT;
 }
 
 uint32 HighResolutionTimerCalibrator::Counter32() {
-    return HAL_GetTick()*1000 + __TIMER__NAME__->CNT;
+    return (uint32) Counter();
 }
+
+HighResolutionTimerCalibrator calibratedHighResolutionTimer;
 
 }

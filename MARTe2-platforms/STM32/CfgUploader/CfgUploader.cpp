@@ -97,18 +97,18 @@ bool CfgUploader::UploadCfg(StreamString &cfgBuffer) {
         //REPORT_ERROR_PARAMETERS(ErrorManagement::Warning, "Read %d %s", sizeToRead, buffer);
         ret = (initialSequence == buffer);
         if (ret) {
-            REPORT_ERROR(ErrorManagement::Warning, "Read Initial Sequence");
+            REPORT_ERROR(ErrorManagement::Information, "Read Initial Sequence");
             MemoryOperationsHelper::Set(buffer, 0, packetSize + 1);
             for (;;) {
                 sizeToRead = packetSize;
                 stream->Read(buffer, sizeToRead, (uint32)(-1));
                 buffer[packetSize] = 0;
-                REPORT_ERROR(ErrorManagement::Warning, "---------------------");
-                REPORT_ERROR(ErrorManagement::Warning, (const char8 *)buffer);
-                REPORT_ERROR(ErrorManagement::Warning, "---------------------");
+                //REPORT_ERROR(ErrorManagement::Warning, "---------------------");
+                //REPORT_ERROR(ErrorManagement::Warning, (const char8 *)buffer);
+                //REPORT_ERROR(ErrorManagement::Warning, "---------------------");
 
                 if (finalSequence == buffer) {
-                    REPORT_ERROR(ErrorManagement::Warning, "Read Final Sequence");
+                    REPORT_ERROR(ErrorManagement::Information, "Read Final Sequence");
                     break;
                 }
                 cfgBuffer += buffer;

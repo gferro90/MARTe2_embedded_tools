@@ -16,16 +16,16 @@ public:
     CLASS_REGISTER_DECLARATION()
 
 GPIOWriter();
-	virtual ~GPIOWriter();
-	virtual bool Execute();
+    virtual ~GPIOWriter();
+    virtual bool Execute();
 
-	virtual bool Init(const SignalDirection direction,
-	                           DataSourceI &dataSourceIn,
-	                           const char8 * const functionName,
-	                           void * const gamMemoryAddress);
+    virtual bool Init(const SignalDirection direction,
+                               DataSourceI &dataSourceIn,
+                               const char8 * const functionName,
+                               void * const gamMemoryAddress);
 
 private:
-	GPIO_TypeDef *gpioHandle;
+    GPIO_TypeDef *gpioHandle;
 };
 
 #endif /* GPIOWRITER_H_ */

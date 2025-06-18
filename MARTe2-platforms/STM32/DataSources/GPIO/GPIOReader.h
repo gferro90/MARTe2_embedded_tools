@@ -15,18 +15,18 @@ using namespace MARTe;
 
 class GPIOReader: public MemoryMapInputBroker {
 public:
-	CLASS_REGISTER_DECLARATION()
+    CLASS_REGISTER_DECLARATION()
 
-	GPIOReader();
-	virtual ~GPIOReader();
-	virtual bool Execute();
+    GPIOReader();
+    virtual ~GPIOReader();
+    virtual bool Execute();
 
-	virtual bool Init(const SignalDirection direction,
-			DataSourceI &dataSourceIn, const char8 * const functionName,
-			void * const gamMemoryAddress);
+    virtual bool Init(const SignalDirection direction,
+            DataSourceI &dataSourceIn, const char8 * const functionName,
+            void * const gamMemoryAddress);
 
 private:
-	GPIO_TypeDef *gpioHandle;
+    GPIO_TypeDef *gpioHandle;
 };
 
 #endif /* GPIO_GPIOREADER_H_ */
