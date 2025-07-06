@@ -1,6 +1,6 @@
 /**
- * @file AdcDmaDataSource.h
- * @brief Header file for class AdcDmaDataSource
+ * @file DacDmaDataSource.h
+ * @brief Header file for class DacDmaDataSource
  * @date 28/set/2016
  * @author pc
  *
@@ -42,21 +42,21 @@ using namespace MARTe;
 /*---------------------------------------------------------------------------*/
 
 /**
- * @brief ADC acquisition using DMA
+ * @brief DAC generation using DMA
  *
- * @details The user must configure a number of uint16 signals equal to the number of channels enabled for conversion in STM32CubeMX. He must configure
- * also the ADC handler and the timer triggering the channel set sampling (also set in STM32CubeMX). The user can also configure the multi-channel sampling
- * frequency and the number of buffers. The DMA autonomously writes on the circular buffer and the data source reads following the DMA and writing
- * the values transferred from the DMA to the GAM. If for some reason the data source is going to read the buffer being written by the DMA, then it waits one cycle
- * providing to the GAM again the value of the old buffer.
+ * @details The user must configure a number of uint32 signals equal to the number of channels enabled for conversion in STM32CubeMX. He must configure
+ * also the DAC handler and the timer triggering the channel sampling out (also set in STM32CubeMX). The user can also configure the channel sampling out
+ * frequency and the number of buffers. The data source (broker) writes the data from the GAM to the internal circular buffer and the DMA autonomously transfers
+ * the samples to the pheripheral reading from the circular buffer. If for some reason the DMA is going to read the buffer being written by the data source, then
+ * it waits one cycle transferring the old buffer to the pheripheral
  *
  * @details Follows an example of configuration
  * <pre>
- * +ADC = {
- *     Class = AdcDmaDataSource
- *     Identifier = hadc1 //The ADC handle
- *     TriggerTimer = htim5 //The timer triggering the ADC multi-channel sampling
- *     ConversionFrequency = 100 //The multi-channel sampling frequency
+ * +DAC = {
+ *     Class = DacDmaDataSource
+ *     Identifier = hdac //The DAC handle
+ *     TriggerTimer = htim7 //The timer triggering the DAC sampling out
+ *     ConversionFrequency = 100 //The sampling out frequency
  *     NumberOfBuffers = 5 //Number of buffer (circular). It's recommended to set this number >2.
  *     Signals = {
  *         Channel0 = {
@@ -67,7 +67,7 @@ using namespace MARTe;
  * }
  * </pre>
  */
-class AdcDmaDataSource: public MemoryDataSourceI {
+class DacDmaDataSource: public MemoryDataSourceI {
 public:
 
     CLASS_REGISTER_DECLARATION()
@@ -75,17 +75,17 @@ public:
     /**
      * @brief Constructor
      */
-    AdcDmaDataSource();
+    DacDmaDataSource();
 
     /**
      * @brief Destructor. It stops the DMA
      */
-    virtual ~AdcDmaDataSource();
+    virtual ~DacDmaDataSource();
 
     /**
      * @brief Initialises the component
      * @details The user can set the following parameters:
-     *   - Identifier: the ADC handle identifier
+     *   - Identifier: the DAC handle identifier
      *   - TriggerTimer: the trigger timer identifier
      *   - ConversionFrequency: the timer frequency
      *   - NumberOfBuffer: the internal circular buffer number of buffers
@@ -93,14 +93,7 @@ public:
     virtual bool Initialise(StructuredDataI &data);
 
     /**
-     * @brief Returns the offset of the memory to be copied to the GAM.
-     * @details The offset depends on the incremental index for the buffer to be written to the GAM
-     */
-    virtual bool GetInputOffset(const uint32 signalIdx, const uint32 numberOfSamples, uint32 &offset);
-
-
-    /**
-     * @brief Returns the broker name (MemoryMapSynchronisedMultiBufferInputBroker)
+     * @brief Returns the broker name (MemoryMapSynchronisedMultiBufferOutputBroker)
      */
     virtual const char8 *GetBrokerName(StructuredDataI &data,
                                        const SignalDirection direction);
@@ -118,7 +111,13 @@ public:
                                   const char8 * const nextStateName);
 
     /**
-     * @brief Increments the buffer index if the DMA is at least one step forward.
+     * @brief Returns the offset of the memory to be copied to the GAM.
+     * @details The offset depends on the incremental index for the buffer to be written to the GAM
+     */
+    virtual bool GetOutputOffset(const uint32 signalIdx, const uint32 numberOfSamples, uint32 &offset);
+
+    /**
+     * @brief Returns true
      */
     bool Synchronise();
 
@@ -126,26 +125,21 @@ private:
     /**
      * The ADC Handle
      */
-    ADC_HandleTypeDef *adcDmaDataSourceHandlePtr;
+    DAC_HandleTypeDef *dacDmaDataSourceHandlePtr;
 
     /**
      * The trigger timer handle
      */
     TIM_HandleTypeDef *triggerTimerHandlePtr;
-
-    /**
-     * The number of ADC samples per channel
-     */
-    uint16 nSignalElementsLocal;
     /**
      * Is started flag
      */
     bool started;
 
     /**
-     * Last buffer written to GAM
+     * The number of elements for each channels
      */
-    uint8 writtenIdx;
+    uint16 nSignalElementsLocal[2];
 };
 
 /*---------------------------------------------------------------------------*/
