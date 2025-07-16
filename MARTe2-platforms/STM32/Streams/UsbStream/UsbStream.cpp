@@ -57,11 +57,13 @@ bool UsbStream::Read(char8 * const output,
                      uint32 timeout) {
     USBRead(output, (uint32_t*) &size, (timeout == 0));
     USBSync();
+    return true;
 }
 bool UsbStream::Write(const char8 * const input,
                       uint32 & size,
                       uint32 timeout) {
     USBWrite(input, (uint32_t*) &size, (timeout == 0));
     USBSync();
+    return true;
 }
 CLASS_REGISTER(UsbStream, "1.0")
