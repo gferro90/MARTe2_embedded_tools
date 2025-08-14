@@ -1,8 +1,8 @@
 /**
- * @file BasicScheduler.cpp
- * @brief Source file for class BasicScheduler
- * @date 6 Aug 2016
- * @author andre
+ * @file UdpReceiverDataSource.cpp
+ * @brief Source file for class UDP Receiver
+ * @date 28/set/2016
+ * @author pc
  *
  * @copyright Copyright 2015 F4E | European Joint Undertaking for ITER and
  * the Development of Fusion Energy ('Fusion for Energy').
@@ -17,7 +17,7 @@
  * or implied. See the Licence permissions and limitations under the Licence.
 
  * @details This source file contains the definition of all the methods for
- * the class BasicScheduler (public, protected, and private). Be aware that some 
+ * the class UdpReceiverDataSource (public, protected, and private). Be aware that some
  * methods, such as those inline could be defined on the header file, instead.
  */
 
@@ -28,51 +28,67 @@
 /*---------------------------------------------------------------------------*/
 /*                         Project header includes                           */
 /*---------------------------------------------------------------------------*/
-#include "BasicScheduler.h"
-#include "RealTimeApplication.h"
+
+#include "UdpReceiverDataSource.h"
+#include "ObjectRegistryDatabase.h"
+#include "AdvancedErrorManagement.h"
 
 /*---------------------------------------------------------------------------*/
 /*                           Static definitions                              */
 /*---------------------------------------------------------------------------*/
-//extern int8 SM_changeState;
 
 /*---------------------------------------------------------------------------*/
 /*                           Method definitions                              */
 /*---------------------------------------------------------------------------*/
-BasicScheduler::BasicScheduler() {
-    scheduledStates = NULL;
+
+UdpReceiverDataSource::UdpReceiverDataSource() :
+        MemoryDataSourceI(), udpInterface() {
+//Initialisation already done by the tool !!!
 }
 
-bool BasicScheduler::ConfigureScheduler(Reference realTimeAppIn) {
-    bool ret = GAMSchedulerI::ConfigureScheduler(realTimeAppIn);
+UdpReceiverDataSource::~UdpReceiverDataSource() {
+}
+
+bool UdpReceiverDataSource::Initialise(StructuredDataI &data) {
+    bool ret = MemoryDataSourceI::Initialise(data);
     if (ret) {
-        scheduledStates = GetSchedulableStates();
+        StreamString interfacePath;
+        ret = data.Read("Interface", interfacePath);
+        if (ret) {
+            udpInterface = ObjectRegistryDatabase::Instance()->Find(interfacePath.Buffer());
+            ret = udpInterface.IsValid();
+            if (!ret) {
+                REPORT_ERROR(ErrorManagement::FatalError, "Interface %s not valid", interfacePath.Buffer());
+            }
+        } else {
+            REPORT_ERROR(ErrorManagement::InitialisationError, "Interface not specified");
+        }
+
     }
     return ret;
 }
 
-ErrorManagement::ErrorType BasicScheduler::StartNextStateExecution() {
-    ErrorManagement::ErrorType err;
-    //while (!SM_changeState) {
-    while (1) {
-        //run the first thread
-        Cycle(0);
+bool UdpReceiverDataSource::Synchronise() {
+    uint32 size = totalMemorySize;
+    return udpInterface->Read((char8*) memory, size, 0u);
+}
 
+bool UdpReceiverDataSource::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
+    return MemoryDataSourceI::SetConfiguredDatabase(data);
+}
+
+const char8* UdpReceiverDataSource::GetBrokerName(StructuredDataI &data, const SignalDirection direction) {
+    if (direction == InputSignals) {
+        return "MemoryMapSynchronisedInputBroker";
     }
-    return err;
+
+    return "";
 }
 
-ErrorManagement::ErrorType BasicScheduler::StopCurrentStateExecution() {
-    ErrorManagement::ErrorType err;
-    return err;
+bool UdpReceiverDataSource::PrepareNextState(const MARTe::char8 *const currentStateName, const MARTe::char8 *const nextStateName) {
+
+    return true;
+
 }
 
-void BasicScheduler::Cycle(uint32 threadId) {
-    ReferenceT<RealTimeApplication> rtApp=realTimeApp;
-    ExecuteSingleCycle(scheduledStates[rtApp->GetIndex()]->threads[threadId].executables,
-                       scheduledStates[rtApp->GetIndex()]->threads[threadId].numberOfExecutables);
-}
-
-void BasicScheduler::CustomPrepareNextState(){
-}
-CLASS_REGISTER(BasicScheduler, "1.0")
+CLASS_REGISTER(UdpReceiverDataSource, "1.0")

@@ -137,6 +137,7 @@ private:
      * The number of ADC samples per channel
      */
     uint16 nSignalElementsLocal;
+
     /**
      * Is started flag
      */

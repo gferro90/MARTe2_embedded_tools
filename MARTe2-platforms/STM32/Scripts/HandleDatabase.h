@@ -31,6 +31,8 @@ void init_##varName(){\
 
 void *GetHandle(const char *handleName);
 
+unsigned long long GetCounter();
+
 #ifdef __cplusplus
  }
 #endif

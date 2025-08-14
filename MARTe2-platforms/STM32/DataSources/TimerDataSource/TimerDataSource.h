@@ -153,7 +153,7 @@ public:
     /**
      * Holds the current elapsed time
      */
-    uint32 dataSourceTime;
+    uint64 dataSourceTime;
 
     /**
      * The event semaphore used to synchronise

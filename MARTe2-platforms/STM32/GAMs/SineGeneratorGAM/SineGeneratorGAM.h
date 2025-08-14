@@ -1,8 +1,8 @@
 /**
- * @file UdpStream.h
- * @brief Header file for class UdpStream
- * @date Jun 16, 2017
- * @author pc
+ * @file SineGeneratorGAM.h
+ * @brief Header file for class BufferGAM
+ * @date 6 Aug 2016
+ * @author andre
  *
  * @copyright Copyright 2015 F4E | European Joint Undertaking for ITER and
  * the Development of Fusion Energy ('Fusion for Energy').
@@ -16,13 +16,13 @@
  * basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the Licence permissions and limitations under the Licence.
 
- * @details This header file contains the declaration of the class UdpStream
+ * @details This header file contains the declaration of the class BufferGAM
  * with all of its public, protected and private members. It may also include
  * definitions for inline methods which need to be visible to the compiler.
  */
 
-#ifndef UDPSTREAM_H_
-#define UDPSTREAM_H_
+#ifndef SINEGENERATOR_H_
+#define SINEGENERATOR_H_
 
 /*---------------------------------------------------------------------------*/
 /*                        Standard header includes                           */
@@ -31,87 +31,64 @@
 /*---------------------------------------------------------------------------*/
 /*                        Project header includes                            */
 /*---------------------------------------------------------------------------*/
-#include "StreamParent.h"
-#include "lwip.h"
+#include "GAM.h"
+
+using namespace MARTe;
 
 /*---------------------------------------------------------------------------*/
 /*                           Class declaration                               */
 /*---------------------------------------------------------------------------*/
 
-using namespace MARTe;
-
-/**
- * @brief Implementation of UDP communication interface for STM32 boards.
- */
-class UdpStream: public StreamParent {
+class SineGeneratorGAM: public GAM {
 public:
     CLASS_REGISTER_DECLARATION()
 
     /**
      * @brief Constructor
      */
-    UdpStream();
+    SineGeneratorGAM();
 
     /**
      * @brief Destructor
      */
-    virtual ~UdpStream();
+    virtual ~SineGeneratorGAM();
 
-    /**
-     * @brief Creates the socket and binds to provided local IPs and Port
-     * @details The static IP must match the one defined in STM32Cube.
-     * User must configure the following parameters:
-     *  - LocalIpAddress: a 4 bytes array specifying the board IP
-     *  - LocalPort: the port to bind to
-     */
     virtual bool Initialise(StructuredDataI &data);
 
-    /**
-     * @brief Creates the socket and binds to provided local IPs and Port
-     * @param[in] ip: a 4 bytes array specifying the board IP
-     * @param[in] port: the port to bind to
-     * @details This function is called by Initialise, to it is meant to be explicitely called when not used with Initialise.
-     */
-    virtual bool Open(const uint8 *ip, uint16 port);
+    virtual bool Execute();
 
-    /**
-     * @brief Connects to remote host
-     * @param[in] ip: a 4 bytes array specifying the remote IP to connect to
-     * @param[in] port: the remote port to connect to
-     */
-    virtual bool Connect(const uint8 *ip, uint16 port);
+    virtual bool Setup();
 
-    /**
-     * @see StremParent::Read
-     * @details Reads from the UDP queue (1024 bytes)
-     */
-    virtual bool Read(char8 * const output,
-                      uint32 & size,
-                      uint32 timeout);
-
-    /**
-     * @see StremParent::Write
-     * @details Sends the buffer to UDP.
-     */
-    virtual bool Write(const char8 * const input,
-                       uint32 & size,
-                       uint32 timeout);
 
 private:
+    float32 *amplitude;
 
-    /**
-     * The UDP structure
-     */
-    struct udp_pcb *upcb;
+    float32 *phase;
 
-    ip_addr_t remoteIp;
+    float32 *offset;
 
-    uint16 remotePort;
+    float32 *frequency;
+
+    uint64 *timestampUs;
+
+    uint16 *sine;
+
+    uint32 sampleTime;
+
+    uint32 numberOfSineElements;
+
+    float32 inputMin;
+
+    float32 inputMax;
+
+    uint16 outputMin;
+
+    uint16 outputMax;
 };
 
 /*---------------------------------------------------------------------------*/
 /*                        Inline method definitions                          */
 /*---------------------------------------------------------------------------*/
 
-#endif /* UDPSTREAM_H_ */
+#endif /* SINEGENERATOR_H_ */
 

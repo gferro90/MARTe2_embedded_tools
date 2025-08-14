@@ -34,6 +34,7 @@
 #include "Threads.h"
 #include "FastPollingMutexSem.h"
 #include "HighResolutionTimer.h"
+#include "HandleDatabase.h"
 #include QUOTE(_HAL_H)
 
 /*---------------------------------------------------------------------------*/
@@ -45,7 +46,7 @@ static void TimerThreadFunction(TimerDataSource &timerDataSource) {
     float32 sleepTime = calibTodo * (timerDataSource.sleepCounter * HighResolutionTimer::Period());
     while (timerDataSource.running) {
         Sleep::Sec(sleepTime);
-        timerDataSource.dataSourceTime += (uint32) (sleepTime * 1e6);
+        timerDataSource.dataSourceTime += (uint64) (sleepTime * 1e6);
         //timerDataSource.triggered = true;
         timerDataSource.synchSem.Post();
     }
@@ -56,7 +57,7 @@ static void TimerThreadFunction(TimerDataSource &timerDataSource) {
 /*---------------------------------------------------------------------------*/
 TimerDataSource::TimerDataSource() :
         DataSourceI() {
-    dataSourceTime = 0u;
+    dataSourceTime = 0ull;
     synchSem.Create();
     synchSem.Reset();
     running = false;
@@ -103,7 +104,7 @@ bool TimerDataSource::Synchronise() {
             uint64 counter = HighResolutionTimer::Counter();
             if (counter >= targetCounter) {
                 targetCounter += sleepCounter;
-                dataSourceTime = (counter * HighResolutionTimer::Period()) * 1e6;
+                dataSourceTime = (uint64) ((counter * HighResolutionTimer::Period()) * 1e6);
                 break;
             }
         }
@@ -161,10 +162,13 @@ bool TimerDataSource::SetConfiguredDatabase(StructuredDataI &data) {
     }
 
     if (ret) {
-        //the type must be uint32
+        //the type must be uint32 or uint64
         ret = (GetSignalType(0) == TypeDescriptor::GetTypeDescriptorFromTypeName("uint32"));
         if (!ret) {
-            REPORT_ERROR(ErrorManagement::InitialisationError, "The time signal type has to be uint32");
+            ret = (GetSignalType(0) == TypeDescriptor::GetTypeDescriptorFromTypeName("uint64"));
+            if (!ret) {
+                REPORT_ERROR(ErrorManagement::InitialisationError, "The time signal type has to be uint32 or uint64");
+            }
         }
     }
 

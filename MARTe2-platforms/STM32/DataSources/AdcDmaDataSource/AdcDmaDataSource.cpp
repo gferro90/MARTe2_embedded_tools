@@ -138,7 +138,7 @@ bool AdcDmaDataSource::Initialise(StructuredDataI &data) {
 
 bool AdcDmaDataSource::GetInputOffset(const uint32 signalIdx, const uint32 numberOfSamples, uint32 &offset) {
     bool ret = true;
-    offset = (writtenIdx * nSignalElementsLocal * sizeof(uint16));
+    offset = ((signalIdx * numberOfBuffers) + writtenIdx) * (nSignalElementsLocal * sizeof(uint16));
 
     return ret;
 }

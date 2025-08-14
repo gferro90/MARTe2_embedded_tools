@@ -35,9 +35,8 @@
 
 #include "HighResolutionTimerCalibrator.h"
 #include "HighResolutionTimer.h"
-#include "StringHelper.h"
-#include "StreamString.h"
 #include "AdvancedErrorManagement.h"
+#include "HandleDatabase.h"
 
 #include QUOTE(_HAL_H)
 /*---------------------------------------------------------------------------*/
@@ -45,9 +44,8 @@
 /*---------------------------------------------------------------------------*/
 extern "C" {
 void CalibrateTimer() {
-    __TIMER__NAME__->CNT = 0;
+    //__TIMER__NAME__->CNT = 0;
 }
-extern void* GetHandle(const char*);
 }
 /*---------------------------------------------------------------------------*/
 /*                           Method definitions                              */
@@ -55,8 +53,6 @@ extern void* GetHandle(const char*);
 extern void PrintF(const char *const message);
 
 namespace MARTe {
-
-static uint64 globalCounter = 0ull;
 
 HighResolutionTimerCalibrator::HighResolutionTimerCalibrator() {
     frequency = osKernelSysTickFrequency * 1000;
@@ -83,9 +79,7 @@ float64 HighResolutionTimerCalibrator::GetPeriod() const {
 }
 
 uint64 HighResolutionTimerCalibrator::Counter() {
-    uint32 delta = (HAL_GetTick() - (uint32) globalCounter);
-    globalCounter += delta;
-    return (globalCounter * 1000ull) + __TIMER__NAME__->CNT;
+    return (GetCounter() * 1000ull) + __TIMER__NAME__->CNT;
 }
 
 uint32 HighResolutionTimerCalibrator::Counter32() {

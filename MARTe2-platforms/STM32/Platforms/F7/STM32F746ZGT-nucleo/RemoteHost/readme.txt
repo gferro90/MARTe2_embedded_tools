@@ -1,0 +1,1 @@
+This folder contains the config files to be run on a remote host (linux, raspberry pi, etc.) and coupled with the relative config files in Demos.

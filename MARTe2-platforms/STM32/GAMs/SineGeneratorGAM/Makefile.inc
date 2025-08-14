@@ -23,10 +23,11 @@
 # $Id: Makefile.inc 3 2012-01-15 16:26:07Z aneto $
 #
 #############################################################
-OBJSX=UdpSenderDataSource.x UdpReceiverDataSource.x
+OBJSX=SineGeneratorGAM.x
 
 SPB =
-PACKAGE = DataSources
+
+PACKAGE = GAMs
 
 MAKEDEFAULTDIR=$(MARTe2_Embedded_Tools_DIR_BASE)/MakeDefaults
 
@@ -35,15 +36,6 @@ include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
 INCLUDES += -I.
 INCLUDES += -I$(PROJECT_CONF_INCLUDES)
-INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/BSP/Components/Common/
-INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/$(DRIVER_PLATFORM)_HAL_Driver/Inc/
-INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Device/ST/STM32F7xx/Include/
-INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Include/
-INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/BSP/Components/otm8009a/
-INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/$(DRIVER_PLATFORM)_HAL_Driver/Src/
-INCLUDES += -I$(STM_DIR)/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/
-INCLUDES += -I$(STM_DIR)/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/
-INCLUDES += -I$(STM_DIR)/Middlewares/Third_Party/FreeRTOS/Source/include/
 INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L0Types/
 INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L1Portability/
 INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L1Portability/Environment/FreeRTOS/
@@ -52,15 +44,15 @@ INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L3Streams/
 INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L4Configuration/
 INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L4Messages/
 INCLUDES += -I$(MARTe2_DIR)/Source/Core/BareMetal/L5GAMs/
-INCLUDES += -I$(MARTe2_DIR)/Source/Core/Scheduler/L1Portability/
+INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/BSP/Components/Common/
+INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/$(DRIVER_PLATFORM)_HAL_Driver/Inc/
+INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Device/ST/STM32F7xx/Include/
+INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Include/
+INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/BSP/Components/otm8009a/
 INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/$(DRIVER_PLATFORM)_HAL_Driver/Inc/
 INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Device/ST/$(DRIVER_PLATFORM)/Include/
-INCLUDES += -I../../Streams/StreamParent
-INCLUDES += -I../../Streams/UdpStream
-
-
 all: $(OBJS) $(SUBPROJ) \
-	$(BUILD_DIR)/UdpDataSource$(LIBEXT)
+	$(BUILD_DIR)/SineGeneratorGAM$(LIBEXT)
 
 include $(MAKEDEFAULTDIR)/MakeStdLibRules.$(TARGET)
 

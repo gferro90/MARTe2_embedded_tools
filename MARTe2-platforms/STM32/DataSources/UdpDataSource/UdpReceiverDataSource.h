@@ -1,7 +1,7 @@
 /**
- * @file UdpStream.h
- * @brief Header file for class UdpStream
- * @date Jun 16, 2017
+ * @file UdpReceiverDataSource.h
+ * @brief Header file for class UdpReceiverDataSource
+ * @date 28/set/2016
  * @author pc
  *
  * @copyright Copyright 2015 F4E | European Joint Undertaking for ITER and
@@ -16,13 +16,13 @@
  * basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the Licence permissions and limitations under the Licence.
 
- * @details This header file contains the declaration of the class UdpStream
+ * @details This header file contains the declaration of the class ADCDMA
  * with all of its public, protected and private members. It may also include
  * definitions for inline methods which need to be visible to the compiler.
  */
 
-#ifndef UDPSTREAM_H_
-#define UDPSTREAM_H_
+#ifndef DATASOURCES_UdpReceiverDataSource_H_
+#define DATASOURCES_UdpReceiverDataSource_H_
 
 /*---------------------------------------------------------------------------*/
 /*                        Standard header includes                           */
@@ -31,87 +31,84 @@
 /*---------------------------------------------------------------------------*/
 /*                        Project header includes                            */
 /*---------------------------------------------------------------------------*/
-#include "StreamParent.h"
-#include "lwip.h"
+
+#include "MemoryDataSourceI.h"
+#include "ReferenceT.h"
+#include "UdpStream.h"
+#include QUOTE(_HAL_H)
+
+using namespace MARTe;
 
 /*---------------------------------------------------------------------------*/
 /*                           Class declaration                               */
 /*---------------------------------------------------------------------------*/
 
-using namespace MARTe;
-
 /**
- * @brief Implementation of UDP communication interface for STM32 boards.
+ * @brief This data source receives data through the ethernet interface using UDP protocol
+ * @details The used must specify the path to UDP stream interface (@see UDPStream) which is initalised with the board local IP and port.
+ *
+ * @details Follows an example of configuration
+ * <pre>
+ * +UdpReceiver = {
+ *     Class = UdpDataSource::UdpReceiverDataSource
+ *     Interface = UdpInterface
+ * }
+ * </pre>
  */
-class UdpStream: public StreamParent {
+class UdpReceiverDataSource: public MemoryDataSourceI {
 public:
+
     CLASS_REGISTER_DECLARATION()
 
     /**
      * @brief Constructor
      */
-    UdpStream();
+    UdpReceiverDataSource();
 
     /**
      * @brief Destructor
      */
-    virtual ~UdpStream();
+    virtual ~UdpReceiverDataSource();
 
     /**
-     * @brief Creates the socket and binds to provided local IPs and Port
-     * @details The static IP must match the one defined in STM32Cube.
-     * User must configure the following parameters:
-     *  - LocalIpAddress: a 4 bytes array specifying the board IP
-     *  - LocalPort: the port to bind to
+     * @brief Initialises the data source
+     * @details The user must define the path to the UDP interface (@see UdpStream) and the remote IpAddress and Port
      */
     virtual bool Initialise(StructuredDataI &data);
 
     /**
-     * @brief Creates the socket and binds to provided local IPs and Port
-     * @param[in] ip: a 4 bytes array specifying the board IP
-     * @param[in] port: the port to bind to
-     * @details This function is called by Initialise, to it is meant to be explicitely called when not used with Initialise.
+     * @brief Returns MemoryMapSynchronisedOutputBroker
      */
-    virtual bool Open(const uint8 *ip, uint16 port);
+    virtual const char8 *GetBrokerName(StructuredDataI &data,
+                                       const SignalDirection direction);
 
     /**
-     * @brief Connects to remote host
-     * @param[in] ip: a 4 bytes array specifying the remote IP to connect to
-     * @param[in] port: the remote port to connect to
+     * @brief Returns true
      */
-    virtual bool Connect(const uint8 *ip, uint16 port);
+    virtual bool SetConfiguredDatabase(MARTe::StructuredDataI & data);
 
     /**
-     * @see StremParent::Read
-     * @details Reads from the UDP queue (1024 bytes)
+     * @brief Returns true
      */
-    virtual bool Read(char8 * const output,
-                      uint32 & size,
-                      uint32 timeout);
+    virtual bool PrepareNextState(const char8 * const currentStateName,
+                                  const char8 * const nextStateName);
 
     /**
-     * @see StremParent::Write
-     * @details Sends the buffer to UDP.
+     * @brief Receives the data source memory buffer over UDP
      */
-    virtual bool Write(const char8 * const input,
-                       uint32 & size,
-                       uint32 timeout);
+    bool Synchronise();
 
 private:
 
     /**
-     * The UDP structure
+     * Pointer to the UDP interface
      */
-    struct udp_pcb *upcb;
-
-    ip_addr_t remoteIp;
-
-    uint16 remotePort;
+    ReferenceT<UdpStream> udpInterface;
 };
 
 /*---------------------------------------------------------------------------*/
 /*                        Inline method definitions                          */
 /*---------------------------------------------------------------------------*/
 
-#endif /* UDPSTREAM_H_ */
+#endif /* UdpReceiverDataSource_H_ */
 
