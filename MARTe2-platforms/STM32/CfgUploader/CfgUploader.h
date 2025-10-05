@@ -41,6 +41,8 @@
 
 using namespace MARTe;
 
+#define CFG_UP_PACKET_SIZE 64u
+#define CFG_UP_BUF_SIZE 65u
 /**
  * @brief Allows to send a configuration file trough a communication device.
  *
@@ -52,8 +54,8 @@ using namespace MARTe;
  * real configuration is the usb interface.
  * <pre>
  * +CfgUploader = {
- *   Class = CfgUploader
- *   InitialSequence = "1234" //the initial sequence asserts that follows significant data
+ *    Class = CfgUploader
+ *    InitialSequence = "1234" //the initial sequence asserts that follows significant data
  *    FinalSequence = "4321" //the final sequence asserts that all the data has been sent
  *    PacketSize = 64 //how many bytes to send per time
  *    +Stream = {
@@ -109,16 +111,17 @@ protected:
    StreamString finalSequence;
 
     /**
-     * Holds the packet size
-     */
-    uint32 packetSize;
-
-    /**
      * Holds the reference to the stream
      * interface to be used to receive the
      * configuration data
      */
     ReferenceT<StreamParent> stream;
+
+    /**
+     * The packet buffer
+     */
+    char8 buffer[CFG_UP_BUF_SIZE];
+
 };
 
 /*---------------------------------------------------------------------------*/

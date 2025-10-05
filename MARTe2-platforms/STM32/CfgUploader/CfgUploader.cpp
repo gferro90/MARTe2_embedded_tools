@@ -41,9 +41,7 @@
 
 CfgUploader::CfgUploader() :
         ReferenceContainer() {
-
-    packetSize = 0u;
-
+    MemoryOperationsHelper::Set(buffer, 0, CFG_UP_PACKET_SIZE + 1);
 }
 
 CfgUploader::~CfgUploader() {
@@ -64,10 +62,6 @@ bool CfgUploader::Initialise(StructuredDataI &data) {
             finalSequence = "1234";
             REPORT_ERROR_PARAMETERS(ErrorManagement::Warning, "Undefined FinalSequence, using default %s", finalSequence.Buffer());
         }
-        if (!data.Read("PacketSize", packetSize)) {
-            packetSize = 64u;
-            REPORT_ERROR_PARAMETERS(ErrorManagement::Warning, "Undefined PacketSize, using default %d", packetSize);
-        }
 
         stream = Find("Stream");
         ret = stream.IsValid();
@@ -84,25 +78,25 @@ bool CfgUploader::UploadCfg(StreamString &cfgBuffer) {
     REPORT_ERROR(ErrorManagement::Information, "In UploadCfg...");
 
     cfgBuffer = "";
-    uint32 sizeToRead = packetSize;
-    char8* buffer = new char8[packetSize + 1];
+    uint32 sizeToRead = CFG_UP_PACKET_SIZE;
+    MemoryOperationsHelper::Set(buffer, 0, CFG_UP_PACKET_SIZE + 1);
     bool ret = (buffer != NULL);
     if (ret) {
-        MemoryOperationsHelper::Set(buffer, 0, packetSize + 1);
+        MemoryOperationsHelper::Set(buffer, 0, CFG_UP_PACKET_SIZE + 1);
         REPORT_ERROR(ErrorManagement::Information, "Before Read");
         stream->Read(buffer, sizeToRead, (uint32)(-1));
         REPORT_ERROR(ErrorManagement::Information, "After Read");
 
-        buffer[packetSize] = 0;
+        buffer[CFG_UP_PACKET_SIZE] = 0;
         //REPORT_ERROR_PARAMETERS(ErrorManagement::Warning, "Read %d %s", sizeToRead, buffer);
         ret = (initialSequence == buffer);
         if (ret) {
             REPORT_ERROR(ErrorManagement::Information, "Read Initial Sequence");
-            MemoryOperationsHelper::Set(buffer, 0, packetSize + 1);
+            MemoryOperationsHelper::Set(buffer, 0, CFG_UP_PACKET_SIZE + 1);
             for (;;) {
-                sizeToRead = packetSize;
+                sizeToRead = CFG_UP_PACKET_SIZE;
                 stream->Read(buffer, sizeToRead, (uint32)(-1));
-                buffer[packetSize] = 0;
+                buffer[CFG_UP_PACKET_SIZE] = 0;
                 //REPORT_ERROR(ErrorManagement::Warning, "---------------------");
                 //REPORT_ERROR(ErrorManagement::Warning, (const char8 *)buffer);
                 //REPORT_ERROR(ErrorManagement::Warning, "---------------------");
@@ -112,11 +106,9 @@ bool CfgUploader::UploadCfg(StreamString &cfgBuffer) {
                     break;
                 }
                 cfgBuffer += buffer;
-                MemoryOperationsHelper::Set(buffer, 0, packetSize + 1);
+                MemoryOperationsHelper::Set(buffer, 0, CFG_UP_PACKET_SIZE + 1);
             }
         }
-
-        delete[] buffer;
     }
     return ret;
 }

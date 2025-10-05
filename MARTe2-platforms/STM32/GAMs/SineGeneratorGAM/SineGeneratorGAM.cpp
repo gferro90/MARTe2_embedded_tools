@@ -67,10 +67,10 @@ bool SineGeneratorGAM::Initialise(StructuredDataI &data) {
             sampleTime = 0u;
         }
         if (!data.Read("InputMin", inputMin)) {
-            inputMin = 0.;
+            inputMin = -1;
         }
         if (!data.Read("InputMax", inputMax)) {
-            inputMax = 3.3;
+            inputMax = 1;
         }
         if (!data.Read("OutputMin", outputMin)) {
             outputMin = 0u;

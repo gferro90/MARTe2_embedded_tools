@@ -54,7 +54,7 @@ bool GpioReader::Initialise(StructuredDataI &data) {
 }
 
 bool GpioReader::Synchronise() {
-    *(uint32*) memory = (gpioHandlePtr->IDR);
+    *(uint16*) memory = (uint16)(gpioHandlePtr->IDR);
 
     return true;
 }
@@ -65,13 +65,13 @@ bool GpioReader::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
     if (ret) {
         ret = (numberOfSignals == 1u);
         if (!ret) {
-            REPORT_ERROR(ErrorManagement::InitialisationError, "The GpioReader must contain only one uint32 signal");
+            REPORT_ERROR(ErrorManagement::InitialisationError, "The GpioReader must contain only one uint16 signal");
         }
     }
     if (ret) {
-        ret = (GetSignalType(0) == TypeDescriptor::GetTypeDescriptorFromTypeName("uint32"));
+        ret = (GetSignalType(0) == TypeDescriptor::GetTypeDescriptorFromTypeName("uint16"));
         if (!ret) {
-            REPORT_ERROR(ErrorManagement::InitialisationError, "The GpioReader signal type must be uint32");
+            REPORT_ERROR(ErrorManagement::InitialisationError, "The GpioReader signal type must be uint16");
         }
         if (ret) {
             uint8 nDims = 0u;

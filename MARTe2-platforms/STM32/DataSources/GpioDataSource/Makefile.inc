@@ -23,7 +23,7 @@
 # $Id: Makefile.inc 3 2012-01-15 16:26:07Z aneto $
 #
 #############################################################
-OBJSX=GpioReader.x GpioWriter.x
+OBJSX=GpioReader.x GpioWriter.x GpioDataSource.x
 
 SPB =
 PACKAGE = DataSources

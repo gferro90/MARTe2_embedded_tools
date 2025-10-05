@@ -45,6 +45,8 @@ public:
     CLASS_REGISTER_DECLARATION()
     BasicScheduler();
 
+    bool Initialise(StructuredDataI & data);
+
     virtual ErrorManagement::ErrorType StartNextStateExecution();
 
     virtual ErrorManagement::ErrorType StopCurrentStateExecution();
@@ -53,9 +55,18 @@ public:
 
     void Cycle(uint32 threadId);
 
+    bool ExecuteSingleCycle(ExecutableI * const * const executables, const uint32 numberOfExecutables) const;
+
     virtual void CustomPrepareNextState();
 
 private:
+
+    bool InsertInputBrokers(ReferenceT<GAM> gam, const char8 * const gamFullName, const uint32 stateIdx, const uint32 threadIdx, uint32 &executableIdx) const;
+
+    bool InsertOutputBrokers(ReferenceT<GAM> gam, const char8 * const gamFullName, const uint32 stateIdx, const uint32 threadIdx, uint32 &executableIdx) const;
+
+    bool InsertGAM(ReferenceT<GAM> gam, const char8 * const gamFullName, const uint32 stateIdx, const uint32 threadIdx, const uint32 executableIdx) const;
+
     ScheduledState * const * scheduledStates;
 };
 

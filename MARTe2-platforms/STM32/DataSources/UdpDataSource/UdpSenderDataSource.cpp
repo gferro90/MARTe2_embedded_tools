@@ -93,7 +93,8 @@ bool UdpSenderDataSource::Synchronise() {
 }
 
 bool UdpSenderDataSource::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
-    return MemoryDataSourceI::SetConfiguredDatabase(data);
+    bool ret = MemoryDataSourceI::SetConfiguredDatabase(data);
+    return ret;
 }
 
 const char8* UdpSenderDataSource::GetBrokerName(StructuredDataI &data, const SignalDirection direction) {
