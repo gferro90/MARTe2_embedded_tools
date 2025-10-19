@@ -23,7 +23,7 @@
 # $Id: Makefile.inc 3 2012-01-15 16:26:07Z aneto $
 #
 #############################################################
-export MARTe2_DIR=/home/giuseppe/MARTe2Project/GIT/MARTe2
+export MARTe2_DIR=/home/giuseppe/MARTe2Project/GIT/MARTe2_embedded_tools/MARTe2
 export MARTe2_Embedded_Tools_DIR_BASE=/home/giuseppe/MARTe2Project/GIT/MARTe2_embedded_tools
 export MARTe2_MAKEDEFAULT_DIR=$(MARTe2_Embedded_Tools_DIR_BASE)/MakeDefaults
 export MARTe2_Components_DIR=/home/giuseppe/MARTe2Project/GIT/MARTe2-components

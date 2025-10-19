@@ -105,6 +105,15 @@ bool UdpStream::Initialise(StructuredDataI &data) {
     Vector<uint8> localIp(4);
     bool ret = data.Read("LocalIpAddress", localIp);
     if (ret) {
+        MX_LWIP_SET_IP_CUSTOM(localIp.GetDataPointer());
+        Vector<uint8> localNetmask(4);
+        if(data.Read("LocalNetmask", localNetmask)){
+            MX_LWIP_SET_NETMASK_CUSTOM(localNetmask.GetDataPointer());
+        }
+        Vector<uint8> localGateway(4);
+        if(data.Read("LocalGateway", localGateway)){
+            MX_LWIP_SET_GATEWAY_CUSTOM(localGateway.GetDataPointer());
+        }
         uint16 port;
         ret = data.Read("LocalPort", port);
         if (ret) {
