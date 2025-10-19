@@ -1,0 +1,151 @@
+##############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+
+%_Gen.cpp : ../Generic/%_Generic.cpp
+	cp ../Generic/$*_Generic.cpp $*_Gen.cpp
+
+CreateLibrary :
+	touch createLibrary
+
+$(BUILD_DIR)/%.obj : %.cpp
+	@echo $(BUILD_DIR)
+	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM) $(INCLUDES)  $*.cpp  $(ASSEMBLER)
+	@if not exist temp mkdir temp
+	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR) >temp/temp
+	@touch $(BUILD_DIR)/$*.obj >temp/temp
+	@rm $(BUILD_DIR)/$*.obj >temp/temp
+	@mv $*.obj $(BUILD_DIR) >temp/temp
+	@touch $(BUILD_DIR)/$*.asm >temp/temp
+	@rm $(BUILD_DIR)/$*.asm >temp/temp
+	@touch $*.asm >temp/temp
+	@mv $*.asm $(BUILD_DIR) >temp/temp
+
+$(BUILD_DIR)/%.obj : %.c
+	@if not exist temp mkdir temp
+	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR) >temp/temp
+	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $(INCLUDES) $*.c  $(ASSEMBLER)
+	@touch $(BUILD_DIR)/$*.obj >temp/temp
+	@rm $(BUILD_DIR)/$*.obj >temp/temp
+	@mv $*.obj $(BUILD_DIR) >temp/temp
+	@touch $(BUILD_DIR)/$*.asm >temp/temp
+	@rm $(BUILD_DIR)/$*.asm >temp/temp
+	@touch $*.asm >temp/temp
+	@mv $*.asm $(BUILD_DIR) >temp/temp
+
+$(BUILD_DIR)/%.obj : %.f
+	@if not exist temp mkdir temp
+	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR) >temp/temp
+	$(FCOMPILER) -compile_only $(FFLAGS) $(FOPTS) $*.f 
+	@touch $(BUILD_DIR)/$*.obj >temp/temp
+	@rm $(BUILD_DIR)/$*.obj >temp/temp
+	@mv $*.obj $(BUILD_DIR) >temp/temp
+
+$(BUILD_DIR)/%.pp :  %.cpp
+	$(COMPILER) -E $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.cpp > $(BUILD_DIR)/$*.pp
+	echo done
+
+%.ifo :  %.h
+	$(COMPILER) -E $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.h > temp/temp.pp
+	
+	cint  -i temp/temp.pp $(MAKEDEFAULTDIR)/MakeIfo.cxx $* > $*.ifo
+
+%.sinfo.cpp :  %.h
+	$(COMPILER) -D_CINT -E $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.h > temp/temp.pp
+	
+	cint.exe   -i  $(MAKEDEFAULTDIR)/MakeIfo.cxx $* > $*.sinfo.cpp
+#-DINCL=temp/temp.pp
+
+	
+$(BUILD_DIR)/%.lib : $(OBJS) $(OBJSRTTI) createLibrary
+	@touch $@
+	@rm $(BUILD_DIR)/$*.lib
+	lib -OUT:$@  $(OBJS) $(LIBRARIES_STATIC) -NODEFAULTLIB
+	@rm createLibrary
+
+$(BUILD_DIR)/%.dll : $(OBJS) $(LIBRARIES) $(IMPDEFS) createLibrary
+	@echo LIBRARY $(@:$(BUILD_DIR)/%.dll=%.dll) > title
+	@cat title $(IMPDEFS) > dllGenerator.def
+	$(COMPILER)  $(LFLAGS) -LDd -Zi $(OBJS) $(LIBRARIES) dllGenerator.def -o $@
+	$(subst /,\,$(ROOT_DIR))\Build\Tools\expdef.exe $@ > $(@:%.dll=%.def)
+	rm dllGenerator.def
+	@rm createLibrary
+	
+$(BUILD_DIR)/dummy.dll : $(OBJS) $(LIBRARIES) $(IMPDEFS)
+	touch dummy.cpp
+	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $(INCLUDES) dummy.cpp  $(ASSEMBLER)
+	@echo LIBRARY $(@:$(BUILD_DIR)/%.dll=%.dll) > title
+	@cat title $(IMPDEFS) > dllGenerator.def
+	$(COMPILER)  $(LFLAGS) -LDd -Zi dummy.obj $(OBJS) $(LIBRARIES) dllGenerator.def -o $@
+	rm dllGenerator.def
+	rm dummy.*
+	
+	
+$(BUILD_DIR)/%.def : $(BUILD_DIR)/dummy.dll
+	$(subst /,\,$(ROOT_DIR))\Build\Tools\expdef.exe $< > $@
+	@rm -f $(BUILD_DIR)/dummy.dll 
+
+
+$(BUILD_DIR)/%.exe : $(OBJS) $(BUILD_DIR)/%.obj $(LIBRARIES) createLibrary
+	$(COMPILER)  $(LFLAGS) -MT -DSFML_STATIC $(DEBUG) $(OBJS) $(BUILD_DIR)/$*.obj $(LIBRARIES) -o $@ $(LOPTS)
+	@if exist createLibrary rm -f createLibrary
+	
+
+$(BUILD_DIR)/%.drv : $(BUILD_DIR)/%.obj $(OBJS)  $(LIBRARIES)  %.def
+	$(COMPILER)  $(LFLAGS) -LDd -Zi $(OBJS) $(BUILD_DIR)/$*.obj $(LIBRARIES) $*.def -o $@
+
+depends.msc : dependsRaw.msc
+	@echo /\.o:/s/^^/$(subst \\,\/,$(BUILD_DIR))\// > CreateMSCDepends.sed
+	sed -f CreateMSCDepends.sed dependsRaw.msc > depends.msc
+
+dependsRaw.msc: 
+	gcc -MM -D_CY32 -DWIN32 $(CFLAGS) $(INCLUDES) -DARCHITECTURE=$(ARCHITECTURE) -DENVIRONMENT=$(ENVIRONMENT) *.c* > dependsRaw.msc
+	@if not exist temp mkdir temp
+	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+
+$(BUILD_DIR)/%.gam : $(BUILD_DIR)/%.obj $(OBJS)  $(LIBRARIES)  %.def
+	$(COMPILER)  $(LFLAGS) -LDd -Zi $(OBJS) $(BUILD_DIR)/$*.obj $(LIBRARIES) $*.def -o $@
+
+%.spb : 
+	$(MAKE) -C $* -f Makefile.$(TARGET)
+
+%.spc : 
+	$(MAKE) -C $* -f Makefile.$(TARGET) clean
+
+clean:  $(SUBPROJC)
+	@if exist depends.* rm -f depends*
+	@if exist $(BUILD_DIR)/*$(DLLEXT) rm -f $(BUILD_DIR)/*$(DLLEXT)	
+	@if exist $(BUILD_DIR)/*$(EXEEXT) rm -f $(BUILD_DIR)/*$(EXEEXT)
+	@if exist $(BUILD_DIR)/*$(LIBEXT) rm -f $(BUILD_DIR)/*$(LIBEXT)
+	@if exist $(BUILD_DIR)/*$(GAMEXT) rm -f $(BUILD_DIR)/*$(GAMEXT)
+	@if exist $(BUILD_DIR)/*$(DRVEXT) rm -f $(BUILD_DIR)/*$(DRVEXT)
+	@if exist $(BUILD_DIR)/*$(ASMEXT) rm -f $(BUILD_DIR)/*$(ASMEXT)
+	@if exist $(BUILD_DIR)/*$(GCNOEXT) rm -f $(BUILD_DIR)/*$(GCNOEXT)
+	@if exist $(BUILD_DIR)/*$(GCDAEXT) rm -f $(BUILD_DIR)/*$(GCDAEXT)
+	@if exist $(BUILD_DIR)/*$(ILKEXT) rm -f $(BUILD_DIR)/*$(ILKEXT)
+	@if exist $(BUILD_DIR)/*$(PDBEXT) rm -f $(BUILD_DIR)/*$(PDBEXT)
+	@if exist $(BUILD_DIR)/*$(DEFEXT) rm -f $(BUILD_DIR)/*$(DEFEXT)	
+	@if exist $(BUILD_DIR)/*$(OBJEXT) rm -f $(BUILD_DIR)/*$(OBJEXT)
+	
+		

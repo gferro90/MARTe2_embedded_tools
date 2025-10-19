@@ -1,0 +1,4 @@
+lxml
+termcolor
+git-python
+unidecode

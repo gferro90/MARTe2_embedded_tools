@@ -1,0 +1,332 @@
+/*
+ * This file defines the deviations to rules which are common to all 
+ * the MARTe framework files. Specific deviation shall be put inside the 
+ * source code comments.
+ * Syntax is:
+ * Rule X-Y-Z
+ * Justification: reason why the rule does not apply
+ */
+
+
+
+/* 
+ * Disable all errors from misra which are related to external libraries not under our control
+ */
+-elib(*)
+-estring(686,"*CPU_ZERO*")
+-estring(686,"*CPU_SET*")
+-estring(686,"*CPU_ISSET*")
+-estring(1960,"*__pthread_cleanup_class*")
+-estring(686,"*FD_ZERO*")
+-estring(686,"*FD_SET*")
+
+/*
+ * In the macro CLASS_REGISTER_DECLARATION we cannot compare against the actual size of class.
+ * The reason is that if the final class inherits from Object and does not use the registration 
+ * CLASS_REGISTER and CLASS_REGISTER_DECLARATION macros (which is a valid use case), then on the 
+ * operator new and operator delete the size of the final class being created/deleted will be compared
+ * against the size of Object which is obviously wrong.  
+ */
+-estring(1531,"*")
+
+/*
+ * CLASS_REGISTER_DECLARATION an instantiation of the loader (which indeed has no nonstatic members) needs to 
+ * be performed in order to register the class methods. This is a warning with minor impact (see manual). 
+ */
+-estring(1502,"*ClassMethodInterfaceMapperLoader*")
+
+/* 
+ * Do not lint operating system files
+ * Remember that Flexelint uses the label of "library" header to 
+ * designate those headers over which a programmer has no control 
+ * (such as compiler headers)
+ */
++libdir(/usr/include/)
+
+/* 
+ * Do not lint operating system and architecture specific code 
+ */
++libh(OperatingSystem/Linux/?*.h)
++libh(OperatingSystem/Linux/lint-linux.h)
++libh(Architecture/x86_gcc/?*.h)
++libh(OperatingSystem/Windows/?*.h)
++libh(Architecture/x86_cl/?*.h)
+
+/*
+ * Disable warnings about repeated include files (i.e. that a given
+ * header was already included by compilation unit).
+ * It not obvious how these warnings are generated. Removing
+ * the proposed header files gives compilation errors.
+ * As written in the manual these can be safely disabled.
+ */
+-e537
+
+/*
+ * We also lint some header files (which are not necessarly modules)
+ */
+-e617
+
+/*
+ * Lint is not understanding that the memory is freed in the destructor
+ */
+ -sem(EventSem::~EventSem, cleanup)
+ -sem(MutexSem::~MutexSem, cleanup)
+
+/*
+ * Linux is not certifiable. Disable all operating system headers related warnings.
+ */
+-e829
+
+/*
+ * Disable warnings related to having .h included in the marte_flint_files.lnt
+ */
+-e617
+
+/*
+ * Rule GLOBAL
+ * Justification: Not applicable to a framework
+ */
+/* global macro not referenced */
+-esym(755,*)
+
+/*
+ * Local enumeration not referenced
+ */
+-esym(749,*)
+
+/*
+ * Local class not referenced
+ */
+-esym(753,*)
+
+
+/*
+ * Local macro not referenced
+ */
+-esym(750,*)
+
+/*
+ * Local declarator not referenced 
+ */
+-esym(752,MARTe::*)
+-esym(752,Notation::*)
+
+/*
+ * Local class member not referenced
+ */
+-esym(754,MARTe::*)
+
+
+
+/* global typedef not referenced */
+-esym(756,intptr,Colours,int*,uint*)
+/* global struct/union/enum not referenced */
+-etype(758,Flags)
+-esym(758,SFTestType)
+/* global struct not referenced */
+-esym(768,MARTe::*)
+-esym(768,isObject)
+
+
+/* global constant enumeration not referenced */ 
+-esym(769,MARTe::*)
+ /* static member not referenced */
+-esym(1715,MARTe::*)
+
+/* member function not referenced */
+-esym(1714,MARTe::*)
+
+/*
+ * Rule 0-1-10 
+ * Symbol not referenced
+ * Justfication: Not applicable to a framework
+ */
+-esym(714,MARTe::*)
+
+/* virtual member function not referenced */
+-esym(1716,MARTe::*)
+
+/* default constructor not referenced */
+-esym(1914,MARTe::*) 
+
+ -esym(1066,MARTe::*)
+
+
+/*
+ * Rule 0-1-11
+ * Justification: In the linux implementation of the console some of the 
+ * features are not supported. As a consequence the method variables are not references. 
+ * The Linux operating system version of MARTe2 is not certifiable. 
+ */
+-efunc(715,BasicConsole::SetColour,BasicConsole::SetTitleBar,BasicConsole::GetTitleBar,BasicConsole::SetCursorPosition,BasicConsole::GetCursorPosition,BasicConsole::SetWindowSize,BasicConsole::GetWindowSize,BasicConsole::PlotChar)
+-efunc(715,Memory::Malloc,Memory::Check)
+-esym(715,errorDescription,errorInfo)
+-efunc(715,previouslyFound)
+
+/*
+ * Rule 0-1-12
+ * Justification: Same as 0-1-11 
+ */
+ -efile(715,BasicConsole.cpp)
+
+/*
+ * Rule 3-3-1
+ * Justification: The extern "C" is the way the framework currently exports symbols.
+ * Being a framework some of these symbols might not be referenced. As a consequence
+ * lint suggests to move the declaration to the .cpp and to make these functions static,
+ * which is obviously not acceptable.
+ */
+ -efunc(1066,Sleep::*)
+-esym(759,ProcessorFamily, ProcessorModel, ProcessorVendorId, ProcessorsAvailable)
+-esym(765,ProcessorFamily, ProcessorModel, ProcessorVendorId, ProcessorsAvailable)
+-esym(759,ProcessorTypeGetDefaultCPUs, ProcessorTypeSetDefaultCPUs)
+-esym(765,ProcessorTypeGetDefaultCPUs, ProcessorTypeSetDefaultCPUs)
+-esym(759,MemoryMalloc, MemoryFree, MemoryRealloc, MemoryAllocationStatistics, MemoryGetHeaderInfo, MemoryClearStatisticsDatabase, MemoryGetStatisticsDatabaseNElements, MemoryGetUsedHeap, MemoryCheck, MemorySharedAlloc, MemorySharedFree, MemoryCopy, MemoryCompare, MemorySearch, MemoryMove, MemorySet, MemoryStringDup)
+-esym(765,MemoryMalloc, MemoryFree, MemoryRealloc, MemoryAllocationStatistics, MemoryGetHeaderInfo, MemoryClearStatisticsDatabase, MemoryGetStatisticsDatabaseNElements, MemoryGetUsedHeap, MemoryCheck, MemorySharedAlloc, MemorySharedFree, MemoryCopy, MemoryCompare, MemorySearch, MemoryMove, MemorySet, MemoryStringDup)
+-esym(765,MemoryMalloc, MemoryFree, MemoryRealloc, MemoryAllocationStatistics, MemoryGetHeaderInfo, MemoryClearStatisticsDatabase, MemoryGetStatisticsDatabaseNElements, MemoryGetUsedHeap, MemoryCheck, MemorySharedAlloc, MemorySharedFree, MemoryCopy, MemoryCompare, MemorySearch, MemoryMove, MemorySet, MemoryStringDup)
+
+/*
+ * MISRA 3-3-1
+ * Defining the Build functions in the header file would require another macro for no good reason (notice
+ * that CLASS_REGISTER_DECLARATION would declare member variables and not global members)
+ */
+ -esym(765, *BuildFn_)
+ 
+/* 
+ * Info flexelint 1711
+ * virtual functions not inherited
+ */
+ -esym(1711,Iterator)
+ -esym(1711,SearchFilter)
+ -esym(1711,SortFilter)
+ -esym(1711,LinkedListable)
+ -esym(1711,LinkedListHolder)
+ // Lint does not see this because of the macros.  
+ -esym(1711,Object)
+ -esym(1711,ReferenceContainer)
+ -esym(1711,ReferenceT*)
+ 
+/*
+ * Rule flexelint 1960 
+ * Rule MISRA 0-1-8
+ * Void functions must have an external effect.
+ * Justification: They changed a class attribute.
+ */
+-esym(1960, MARTe::GAMBareScheduler::CustomPrepareNextState*)
+-esym(1960, MARTe::TimeoutType::SetTimeoutSec*)
+-esym(1960, MARTe::TimeoutType::SetTimeoutHighResolutionTimerTicks*)
+-esym(1960, MARTe::ErrorManagement::NullErrorProcessFunction*)
+-esym(1960, MARTe::ReferenceT<<1>>::Init*)
+-esym(1960, MARTe::ReferenceT<<1>>::RemoveReference*)
+-esym(1960, MARTe::BitBoolean*::operator=*)
+-esym(1960, MARTe::ErrorManagement::ErrorType::ClearError*)
+-esym(1960, MARTe::ErrorManagement::ErrorType::SetError*)
+-esym(1960, MARTe::TimeStamp::SetDay*)
+-esym(1960, MARTe::TimeStamp::SetHour*)
+-esym(1960, MARTe::TimeStamp::SetMinutes*)
+-esym(1960, MARTe::TimeStamp::SetMonth*)
+-esym(1960, MARTe::TimeStamp::SetSeconds*)
+-esym(1960, MARTe::TimeStamp::SetYear*)
+/*
+ * Rule flexelint 1960 
+ * Rule MISRA 0-1-8
+ * Void functions must have an external effect. 
+ * Justification: In Linux EndThread is not implemented.
+ */
+-esym(1960, MARTe::Threads::EndThread*) 
+
+/*
+ * Rule flexelint 1784. 
+ * Justification: This is the pattern used in the framework to export symbols in dlls.
+ */
+ -e1784 /*Symbol previously declared as "C"*/
+ 
+ /*
+  * Rule 18-0-5
+  * Justification: The Linux operating system version of MARTe2 is not certifiable.
+  */
+ -efunc(586,StringHelper::*)
+ -efunc(586,Memory::Malloc,Memory::Free,Memory::Realloc)
+ 
+ /*
+  * Rule flexelint 459.
+  * Justification: The build function is indeed supposed to have access to the private members of Object.
+  * It is as if it was a member function of the class.
+  */
+ -esym(459, *BuildFn_*)
+ -esym(459, *RTThreadRoutine*)
+ -esym(459, *ServiceThreadLauncher*)
+ 
+ /*
+  * Rule 14-7-1
+  * Justification: Not applicable to a framework.
+  */
+-esym(1795, MARTe::*)
+
+/*
+ * Rule flexelint 1531. 
+ * Justification: The object macros guarantee that the new and delete are always implemented in the final object.
+ */
+ -esym(1531, *Object::operator*)
+
+/*
+ * Rule flexelint 1531. 
+ * Justification: Cannot compare the size of the new with the size of the object being constructed. It cannot
+ * be done given that we only know the sizeof(GlobalObjectI) but not the size of a class that inherits from
+ * GlobalObjectI.
+ */
+ -esym(1531, MARTe::GlobalObjectI::*) 
+ 
+/*
+ * Rule flexelint 1511. 
+ * Justification: The operator new and delete of the final classes that inherit from Object, hide on purpose the ones from Object.
+ */
+ -esym(1511, *Object::operator*)
+ 
+ /*
+ * Rule flexelint 1737. 
+ * Justification: The operator new and delete of the final classes that inherit from Object, hide on purpose the ones from Object.
+ */
+ -esym(1737, *::operator new*)
+ 
+ /*
+ * Rule flexelint 1790. 
+ * Justification: For performance reasons it was decided to implement the usage of LinkedListable this way.
+ * This guarantees that the movements in the list are always performed with the correct pointer (i.e. pointing to the base class).
+ * Otherwise it would have required to use dynamic_cast which has a performance impact that we are not ready to give away here.
+ */
+ -estring(1790, *LinkedListable*)
+  
+ /*
+  * Rule 3-1-1
+  * Justification: Required for template implementation. No code is actually being generated and the header
+  * files can be included in multiple unit files.
+  */
+-esym(9107, MARTe::ReferenceT*)
+-esym(9107, MARTe::EmbeddedServiceMethodBinderT*)
+
+/*
+ * Rule flexelint 1793
+ * Justification: Legitimate way of binding a non-const reference to an rvalue so that a direct access to the underlying
+ * object hold by the reference can be retrieved.
+ */
+-estring(1793,"*Reference::operator->*")
+
+/*
+ * Rule 17-0-2 
+ * Justification: Re-use of C++ identifier required to guarantee a portable and unique interpretation of the implementation of PRETTY_FUNCTION  
+ */
+ -esym(1960, __ERROR_FUNCTION_NAME__)
+
+/*
+ * Rule 0-1-8
+ * Justification: these function change the internal private attributes.
+ */
+-estring(1960,"*MARTe::DoubleInteger<<1>>*")
+-estring(1960,"*MARTe::LinkedListHolderT<<1>,<2>>*")  
+
+/*
+ * Rule 0-1-8
+ * Justification: Sleep is not a class.
+ */
+-estring(1960,"*MARTe::Sleep::Busy(double)*") 

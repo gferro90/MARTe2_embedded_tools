@@ -1,0 +1,22 @@
+/.settings/
+/Build/
+/MARTe2-flexlint-result.out
+/.cproject
+/.project
+/MARTe2 linting/
+/TargetFile_Test.txt
+/_Test.txt
+/.README.md.html
+*.dia~
+depends*.*
+dependsRaw.*
+*.d
+*.gcda
+*.gcno
+*.o
+*.a
+GTestDirectoryTest/*
+__pycache__
+
+.vscode
+.clang
