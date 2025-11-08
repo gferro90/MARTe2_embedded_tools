@@ -1,7 +1,7 @@
 /**
- * @file GpioDataSource.h
- * @brief Header file for class GpioDataSource
- * @date 28/set/2016
+ * @file PwmDataSource.h
+ * @brief Header file for class PwmDataSource
+ * @date 08/nov/2025
  * @author pc
  *
  * @copyright Copyright 2015 F4E | European Joint Undertaking for ITER and
@@ -16,13 +16,13 @@
  * basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the Licence permissions and limitations under the Licence.
 
- * @details This header file contains the declaration of the class GpioDataSource
+ * @details This header file contains the declaration of the class PwmDataSource
  * with all of its public, protected and private members. It may also include
  * definitions for inline methods which need to be visible to the compiler.
  */
 
-#ifndef GPIO_GPIODATASOURCE_H_
-#define GPIO_GPIODATASOURCE_H_
+#ifndef GPIO_GPIOWRITER_H_
+#define GPIO_GPIOWRITER_H_
 
 #include "MemoryDataSourceI.h"
 #include QUOTE(_HAL_H)
@@ -31,11 +31,12 @@
 using namespace MARTe;
 
 /**
- * @brief DataSource to read and write digital IOs
+ * @brief DataSource to generate PWM signal
  *
- * @details This data source only accepts one uint32 signal which represent the GPIO mask [reset-31:16][set-15:0]
+ * @details This data source is used to generate a PWM signal. The period is configured in STMCube as 1kHz, the range is 0-999 (500 is 50% duty cycle),
+ * the polarity is high (signal is high for the ticks specified)
  */
-class GpioDataSource : public MemoryDataSourceI {
+class PwmDataSource : public MemoryDataSourceI {
 public:
 
     CLASS_REGISTER_DECLARATION()
@@ -43,27 +44,28 @@ public:
     /**
      * @brief Constructor
      */
-    GpioDataSource();
+    PwmDataSource();
 
     /**
      * @brief Destructor
      */
-    virtual ~GpioDataSource();
+    virtual ~PwmDataSource();
 
     /**
      * @brief Configures the data source
      * @details The user must define
-     *  - Identifier : the GPIO identifier (GPIOA, GPIOB, ecc)
+     *  - Identifier : the PWM timer identifier
+     *  - StartVal : Optional, is the value of PWM at starting
      */
     virtual bool Initialise(StructuredDataI &data);
 
     /**
-     * @brief Resets current output and then set the value of the signal.
+     * @brief Sets the duty cycle to the channel (identified by the signal)
      */
     virtual bool Synchronise();
 
     /**
-     * @brief Checks that only one uint32 signal is declared
+     * @brief Checks that only uint32 signals are declared
      */
     virtual bool SetConfiguredDatabase(MARTe::StructuredDataI & data);
 
@@ -74,22 +76,26 @@ public:
             const SignalDirection direction);
 
     /**
-     * @brief return true
+     * @brief Starts the timer and the PWM generation
      */
     virtual bool PrepareNextState(const char8 * const currentStateName,
             const char8 * const nextStateName);
 
+    /**
+     * @brief Retrieves the Timer handle
+     */
+    TIM_HandleTypeDef * GetHwHandle();
 
 
 private:
 
     /**
-     * The GPIO handle
+     * The timer PWM handle
      */
-    GPIO_TypeDef *gpioHandlePtr[10];
+    TIM_HandleTypeDef *pwmHandle;
 
-    uint32 numberOfInputs;
+    uint32 startVal;
 
 };
 
-#endif /* GPIODATASOURCE_H_ */
+#endif /* GPIOWRITER_H_ */
