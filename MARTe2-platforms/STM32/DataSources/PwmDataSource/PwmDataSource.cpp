@@ -57,7 +57,7 @@ bool PwmDataSource::Initialise(StructuredDataI &data) {
             //get the zero duty cycle
             if (!data.Read("StartVal", startVal)) {
                 startVal = 0u;
-                REPORT_ERROR(ErrorManagement::Warning, "Undefined ZeroVal field. Set to default %d", startVal);
+                REPORT_ERROR(ErrorManagement::Information, "ZeroVal not defined. Set to default %d", startVal);
             }
         }
     }
@@ -80,20 +80,20 @@ bool PwmDataSource::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
     bool ret = MemoryDataSourceI::SetConfiguredDatabase(data);
 
     if (ret) {
-        for (uint32 i = 0u; i < numberOfSignals; i++) {
+        for (uint32 i = 0u; (i < numberOfSignals) && ret; i++) {
             ret = (GetSignalType(i) == TypeDescriptor::GetTypeDescriptorFromTypeName("uint32"));
-            if (!ret) {
-                REPORT_ERROR(ErrorManagement::InitialisationError, "The PwmDataSource signal type must be uint32");
-            }
             if (ret) {
                 uint8 nDims = 0u;
-                ret = (GetSignalNumberOfDimensions(0, nDims));
+                ret = (GetSignalNumberOfDimensions(i, nDims));
                 if (ret) {
                     ret = (nDims == 0u);
                     if (!ret) {
-                        REPORT_ERROR(ErrorManagement::InitialisationError, "The PwmDataSource signal must be a scalar");
+                        REPORT_ERROR(ErrorManagement::InitialisationError, "The PwmDataSource signal[%d] must be scalar", i);
                     }
                 }
+            }
+            else{
+                REPORT_ERROR(ErrorManagement::InitialisationError, "The PwmDataSource signal[%d] type must be uint32", i);
             }
         }
     }
