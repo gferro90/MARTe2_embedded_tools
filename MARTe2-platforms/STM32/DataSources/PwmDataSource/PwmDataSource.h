@@ -55,7 +55,8 @@ public:
      * @brief Configures the data source
      * @details The user must define
      *  - Identifier : the PWM timer identifier
-     *  - StartVal : Optional, is the value of PWM at starting
+     *  - StartVal : Optional, it is the value of PWM at starting
+     *  - Period: Optional, it is the PWM period. Default is 1000.
      */
     virtual bool Initialise(StructuredDataI &data);
 
@@ -96,6 +97,9 @@ private:
 
     uint32 startVal;
 
+    uint16 period;
+
+    uint8 channel[4];
 };
 
 #endif /* GPIOWRITER_H_ */

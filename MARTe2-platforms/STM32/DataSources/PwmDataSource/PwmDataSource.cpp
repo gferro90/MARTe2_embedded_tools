@@ -33,6 +33,13 @@ PwmDataSource::PwmDataSource() :
     pwmHandle = NULL;
 
     startVal=0u;
+
+    period = 1000u;
+
+    channel[0] = 0u;
+    channel[1] = 1u;
+    channel[2] = 2u;
+    channel[3] = 3u;
 }
 
 PwmDataSource::~PwmDataSource() {
@@ -54,6 +61,13 @@ bool PwmDataSource::Initialise(StructuredDataI &data) {
         }
 
         if (ret) {
+            period = 1000u;
+            if (data.Read("Period", period)) {
+                (pwmHandle->Init).Period = (period - 1u);
+                ret = (HAL_TIM_PWM_Init(pwmHandle) == HAL_OK);
+            } else {
+                period = 1000u;
+            }
             //get the zero duty cycle
             if (!data.Read("StartVal", startVal)) {
                 startVal = 0u;
@@ -70,7 +84,13 @@ bool PwmDataSource::Synchronise() {
     uint32 *dutyCycles = (uint32*) memory;
 
     for (uint32 i = 0u; i < numberOfSignals; i++) {
-        __HAL_TIM_SET_COMPARE(pwmHandle, channelNames[i], dutyCycles[i]);
+        uint32 dutyCyclesT = (dutyCycles[i] * 1000u) / period;
+
+        if (dutyCyclesT > (period - 1u)) {
+            dutyCyclesT = (period - 1u);
+        }
+
+        __HAL_TIM_SET_COMPARE(pwmHandle, channelNames[channel[i]], dutyCyclesT);
     }
 
     return true;
@@ -78,7 +98,7 @@ bool PwmDataSource::Synchronise() {
 
 bool PwmDataSource::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
     bool ret = MemoryDataSourceI::SetConfiguredDatabase(data);
-
+    ret = (numberOfSignals <= 4u);
     if (ret) {
         for (uint32 i = 0u; (i < numberOfSignals) && ret; i++) {
             ret = (GetSignalType(i) == TypeDescriptor::GetTypeDescriptorFromTypeName("uint32"));
@@ -91,11 +111,21 @@ bool PwmDataSource::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
                         REPORT_ERROR(ErrorManagement::InitialisationError, "The PwmDataSource signal[%d] must be scalar", i);
                     }
                 }
-            }
-            else{
+                if (ret) {
+                    ret = MoveToSignalIndex(i);
+                    if (ret) {
+                        if (!configuredDatabase.Read("Channel", channel[i])) {
+                            channel[i] = i;
+                            REPORT_ERROR(ErrorManagement::Warning, "Channel not defined for signal %d. Set to %d", i, channel[i]);
+                        }
+                    }
+                }
+            } else {
                 REPORT_ERROR(ErrorManagement::InitialisationError, "The PwmDataSource signal[%d] type must be uint32", i);
             }
         }
+    } else {
+        REPORT_ERROR(ErrorManagement::InitialisationError, "The PwmDataSource allows maximum 4 channels (signals)");
     }
 
     return ret;
@@ -111,8 +141,8 @@ const char8* PwmDataSource::GetBrokerName(StructuredDataI &data, const SignalDir
 
 bool PwmDataSource::PrepareNextState(const MARTe::char8 *const currentStateName, const MARTe::char8 *const nextStateName) {
     for (uint32 i = 0u; i < numberOfSignals; i++) {
-        __HAL_TIM_SET_COMPARE(pwmHandle, channelNames[i], startVal);
-        HAL_TIM_PWM_Start(pwmHandle, channelNames[i]);
+        __HAL_TIM_SET_COMPARE(pwmHandle, channelNames[channel[i]], startVal);
+        HAL_TIM_PWM_Start(pwmHandle, channelNames[channel[i]]);
     }
     return true;
 }

@@ -139,11 +139,15 @@ bool TimerDataSource::GetInputBrokers(ReferenceContainer &inputBrokers, const ch
     ReferenceT < MemoryMapSynchronisedInputBroker > broker("MemoryMapSynchronisedInputBroker");
     bool ret = broker.IsValid();
     if (ret) {
+        REPORT_ERROR(ErrorManagement::Information, "TimerDataSource::GetInputBrokers 0");
         ret = broker->Init(InputSignals, *this, functionName, gamMemPtr);
     }
     if (ret) {
+        REPORT_ERROR(ErrorManagement::Information, "TimerDataSource::GetInputBrokers 1");
         ret = inputBrokers.Insert(broker);
     }
+    REPORT_ERROR_PARAMETERS(ErrorManagement::FatalError, "TimerDataSource::GetInputBrokers exit with %d", ret);
+
     return ret;
 }
 

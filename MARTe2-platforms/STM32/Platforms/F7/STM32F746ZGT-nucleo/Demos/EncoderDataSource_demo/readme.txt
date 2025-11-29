@@ -1,0 +1,1 @@
+This simple configuration file just reads the encoder from TIM1 and writes its value to the logger

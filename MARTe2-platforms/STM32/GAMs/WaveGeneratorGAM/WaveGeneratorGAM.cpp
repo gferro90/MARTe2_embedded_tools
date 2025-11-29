@@ -1,5 +1,5 @@
 /**
- * @file SineGeneratorGAM.cpp
+ * @file WaveGeneratorGAM.cpp
  * @brief Source file for class BufferGAM
  * @date 6 Aug 2016
  * @author andre
@@ -29,7 +29,7 @@
 /*                         Project header includes                           */
 /*---------------------------------------------------------------------------*/
 #include "AdvancedErrorManagement.h"
-#include "SineGeneratorGAM.h"
+#include "WaveGeneratorGAM.h"
 #include "FastMath.h"
 
 using namespace MARTe;
@@ -40,27 +40,32 @@ using namespace MARTe;
 /*---------------------------------------------------------------------------*/
 /*                           Method definitions                              */
 /*---------------------------------------------------------------------------*/
-SineGeneratorGAM::SineGeneratorGAM() :
+WaveGeneratorGAM::WaveGeneratorGAM() :
         GAM() {
-    amplitude = NULL;
-    phase = NULL;
-    offset = NULL;
-    frequency = NULL;
+    time = NULL;
+    value = NULL;
+    period = NULL;
+    pushpull = NULL;
+    interpolation = NULL;
     timestampUs = NULL;
-    sine = NULL;
+    wave = NULL;
     sampleTime = 0u;
-    numberOfSineElements = 1u;
+    numberOfWaveElements = 1u;
     outputMin = 0u;
     outputMax = 4095u;
-    inputMin = 0.;
-    inputMax = 3.3;
+    inputMin = -1.;
+    inputMax = 1.;
+    pushpull_1=0;
+    nPoints=0u;
+    currentPointIdx=0u;
+    nextPointIdx=0u;
 }
 
-SineGeneratorGAM::~SineGeneratorGAM() {
+WaveGeneratorGAM::~WaveGeneratorGAM() {
 
 }
 
-bool SineGeneratorGAM::Initialise(StructuredDataI &data) {
+bool WaveGeneratorGAM::Initialise(StructuredDataI &data) {
     bool ret = GAM::Initialise(data);
     if (ret) {
         if (!data.Read("SampleTimeUs", sampleTime)) {
@@ -82,12 +87,22 @@ bool SineGeneratorGAM::Initialise(StructuredDataI &data) {
     return ret;
 }
 
-bool SineGeneratorGAM::Setup() {
-    bool ret = (numberOfInputSignals == 5u);
+bool WaveGeneratorGAM::Setup() {
+    bool ret = (numberOfInputSignals == 6u);
     if (ret) {
         for (uint32 i = 0u; (i < (numberOfInputSignals - 1u)) && ret; i++) {
             TypeDescriptor td = GetSignalType(InputSignals, i);
-            ret = (td == Float32Bit);
+            if (i == 0u) {
+                ret = (td == UnsignedInteger32Bit);
+            } else if (i == 1u) {
+                ret = (td == Float32Bit);
+            } else if (i == 2u) {
+                ret = (td == UnsignedInteger32Bit);
+            } else if (i == 3u) {
+                ret = (td == SignedInteger8Bit);
+            } else if (i == 4u) {
+                ret = (td == UnsignedInteger8Bit);
+            }
             if (ret) {
                 uint32 nElements;
                 GetSignalNumberOfElements(InputSignals, i, nElements);
@@ -96,7 +111,7 @@ bool SineGeneratorGAM::Setup() {
                     REPORT_ERROR("ErrorManagement::FatalError", "Number of elements of input signal %d shall be equal to number of outputs", i);
                 }
             } else {
-                REPORT_ERROR("ErrorManagement::FatalError", "The type of input signal %d must be float32", i);
+                REPORT_ERROR("ErrorManagement::FatalError", "The type of input signal %d must be %s", TypeDescriptor::GetTypeNameFromTypeDescriptor(td));
             }
         }
         TypeDescriptor td = GetSignalType(InputSignals, (numberOfInputSignals - 1u));
@@ -117,42 +132,117 @@ bool SineGeneratorGAM::Setup() {
         }
     }
     if (ret) {
-        numberOfSineElements = 1u;
+        numberOfWaveElements = 1u;
         if (sampleTime > 0u) {
             uint32 numberOfTimeElements = 0u;
             GetSignalNumberOfElements(InputSignals, (numberOfInputSignals - 1u), numberOfTimeElements);
-            GetSignalNumberOfElements(OutputSignals, 0u, numberOfSineElements);
-            ret = (numberOfTimeElements == numberOfSineElements);
+            GetSignalNumberOfElements(OutputSignals, 0u, numberOfWaveElements);
+            ret = (numberOfTimeElements == numberOfWaveElements);
             if (ret) {
                 REPORT_ERROR("ErrorManagement::FatalError", "If SampleTimeUs not defined, the Timestamp (input signal 3) must have same #elements of Sine (output signals)");
             }
         }
     }
     if (ret) {
-        amplitude = (float32*) GetInputSignalMemory(0u);
-        phase = (float32*) GetInputSignalMemory(1u);
-        offset = (float32*) GetInputSignalMemory(2u);
-        frequency = (float32*) GetInputSignalMemory(3u);
-        timestampUs = (uint64*) GetInputSignalMemory(4u);
+        time = (uint32*) GetInputSignalMemory(0u);
+        value = (float32*) GetInputSignalMemory(1u);
+        period = (uint32*) GetInputSignalMemory(2u);
+        interpolation = (uint8*) GetInputSignalMemory(3u);
+        pushpull = (int8*) GetInputSignalMemory(4u);
+        timestampUs = (uint64*) GetInputSignalMemory(5u);
 
-        sine = (uint16*) GetOutputSignalMemory(0u);
+        wave = (uint16*) GetOutputSignalMemory(0u);
     }
     return ret;
 }
 
-bool SineGeneratorGAM::Execute() {
+bool WaveGeneratorGAM::Execute() {
+    if (((*pushpull) > 0) && (pushpull_1 == 0)) {
+        //add new value
+        AddPoint();
+    }
+    if (((*pushpull) < 0) && (pushpull_1 == 0)) {
+        //remove existent value
+        RemovePoint();
+    }
+
     for (uint32 n = 0; n < numberOfOutputSignals; n++) {
-        uint64 timeUs = timestampUs[0];
-        for (uint32 i = 0u; i < numberOfSineElements; i++) {
-            float32 timeF = timeUs / 1.e6;
-            float32 angle = (2 * FastMath::PI * (frequency[n]) * timeF) + (phase[n]);
-            float32 sineFlt = ((amplitude[n]) * FastMath::Sin(angle)) + (offset[n]);
-            float32 factor = (sineFlt - inputMin) / ((float32) (inputMax - inputMin));
-            sine[(n * numberOfSineElements) + i] = (uint16) (((outputMax - outputMin) * factor) + outputMin);
+        uint32 timeUs = (uint32) (timestampUs[0] % (*period));
+        for (uint32 i = 0u; i < numberOfWaveElements; i++) {
+            if (timeUs >= times[nextPointIdx]) {
+                currentPointIdx = nextPointIdx;
+                nextPointIdx = (currentPointIdx + 1u) % nPoints;
+            }
+            if ((*interpolation) == 0u) {
+                wave[i] = points[currentPointIdx];
+            } else if ((*interpolation) == 1u) {
+                uint32 deltaX = times[currentPointIdx] - times[nextPointIdx];
+                uint16 deltaY = points[currentPointIdx] - points[nextPointIdx];
+                float32 step = deltaY / ((float32) deltaX);
+                wave[i] = points[currentPointIdx] + step * (timeUs - times[currentPointIdx]);
+            }
             timeUs += sampleTime;
         }
     }
+    pushpull_1 = (*pushpull);
     return true;
 }
 
-CLASS_REGISTER(SineGeneratorGAM, "1.0")
+void WaveGeneratorGAM::AddPoint() {
+    uint8 max = nPoints;
+    uint8 min = 0u;
+    uint8 index = ((max - min) / 2);
+    bool add = true;
+    if (nPoints < 128) {
+        while (max > min) {
+            index = ((max - min) / 2);
+            if ((*time) > times[index]) {
+                min = index;
+            } else if ((*time) < times[index]) {
+                max = index;
+            } else {
+                //do nothing, other value at same time
+                add = false;
+                break;
+            }
+        }
+        if (add) {
+            MemoryOperationsHelper::Move(times[index + 1u], times[index], (nPoints - index));
+            MemoryOperationsHelper::Move(points[index + 1u], points[index], (nPoints - index));
+
+            times[index] = (*time);
+            float32 factor = ((*value) - inputMin) / ((float32) (inputMax - inputMin));
+            points[index] = (uint16) (((outputMax - outputMin) * factor) + outputMin);
+            nPoints++;
+        }
+    }
+}
+
+void WaveGeneratorGAM::RemovePoint() {
+    uint8 max = nPoints;
+    uint8 min = 0u;
+    uint8 index = ((max - min) / 2);
+    bool found = false;
+    if (nPoints > 0u) {
+        while (max > min) {
+            index = ((max - min) / 2);
+            if ((*time) > times[index]) {
+                min = index;
+            } else if ((*time) < times[index]) {
+                max = index;
+            } else {
+                //do nothing, other value at same time
+                found = true;
+                break;
+            }
+        }
+        if (found) {
+            nPoints--;
+            MemoryOperationsHelper::Move(times[index], times[index+1], (nPoints - index));
+            MemoryOperationsHelper::Move(points[index], points[index+1], (nPoints - index));
+        }
+    }
+}
+
+
+CLASS_REGISTER(WaveGeneratorGAM, "1.0")

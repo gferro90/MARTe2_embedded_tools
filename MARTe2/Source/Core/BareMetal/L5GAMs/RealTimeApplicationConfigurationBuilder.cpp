@@ -3725,35 +3725,17 @@ void RealTimeApplicationConfigurationBuilder::CleanCaches() {
 bool RealTimeApplicationConfigurationBuilder::WriteDefault(StructuredDataI &sdi, const char8 * const signalName, const char8 * const dataSourceName, const TypeDescriptor &signalTypeDescriptor, const uint32 numberOfDimensions, const uint32 numberOfElements, const uint32 signalNumberOfBytes) const {
     bool ret = true;
     StreamString defaultVal;
-    if (sdi.Read("Default", defaultVal)) {
-        //Check if is a string stored in the StructuredDataI
+
+    //Get the type as it was directly stored
+    AnyType defaultValueAnyType;
+    defaultValueAnyType = sdi.GetType("Default");
+
+    if (!defaultValueAnyType.IsVoid()) {
         bool isString = (signalTypeDescriptor == Character8Bit);
         if (!isString) {
             isString = (signalTypeDescriptor == CharString);
         }
-        //Given that the signal may be stored as a string in the cdb, it will have to be reparsed, otherwise
-        //array signals like {1, 2, 3, 4} will be interpreted as a string (instead of an array of uint32)
-        StreamString defValConfig = "Default=";
-        if (isString) {
-            //Force quotes around the string, otherwise we may get problems with spacs
-            defValConfig += "\"";
-        }
-        defValConfig += defaultVal;
-        if (isString) {
-            defValConfig += "\"";
-        }
-        ret = defValConfig.Seek(0LLU);
-        ConfigurationDatabase cdb;
-        StandardParser parser(defValConfig, cdb);
-        if (ret) {
-            ret = parser.Parse();
-        }
-
         //Get the type as it was directly stored
-        AnyType defaultValueAnyType;
-        if (ret) {
-            defaultValueAnyType = cdb.GetType("Default");
-        }
         uint32 defValDims = defaultValueAnyType .GetNumberOfDimensions();
         if (isString) {
             //Yet another exception for char8[]
@@ -3800,7 +3782,7 @@ bool RealTimeApplicationConfigurationBuilder::WriteDefault(StructuredDataI &sdi,
                 at.SetNumberOfDimensions(static_cast<uint8>(defValDims));
                 at.SetNumberOfElements(0u, numberOfElements);
 
-                ret = cdb.Read("Default", at);
+                ret = sdi.Read("Default", at);
                 if (ret) {
                     ret = sdi.Delete("Default");
                 }

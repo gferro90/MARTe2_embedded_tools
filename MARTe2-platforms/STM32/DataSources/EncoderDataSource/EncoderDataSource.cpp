@@ -74,7 +74,9 @@ bool EncoderDataSource::Synchronise() {
     }
 
     uint16 innerCounter = __HAL_TIM_GET_COUNTER(encoderHandle);
-    int32 delta = (int32)(lastCounter - lastCounter);
+    REPORT_ERROR(ErrorManagement::Information, "Counter %d", innerCounter);
+
+    int32 delta = (int32)((int16)(innerCounter - lastCounter));
     lastCounter = innerCounter;
 
     (*counter) += (invert > 0u) ? (-delta) : (delta);
@@ -118,9 +120,9 @@ bool EncoderDataSource::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
 
 const char8* EncoderDataSource::GetBrokerName(StructuredDataI &data, const SignalDirection direction) {
     if (direction == InputSignals) {
-        return "MemoryMapInputBroker";
+        return "MemoryMapSynchronisedInputBroker";
     } else {
-        return "MemoryMapSynchronisedOutputBroker";
+        return "MemoryMapOutputBroker";
     }
 
     return "";
