@@ -1,5 +1,5 @@
 /**
- * @file SineGeneratorGAM.h
+ * @file MotorControlGAM.h
  * @brief Header file for class BufferGAM
  * @date 6 Aug 2016
  * @author andre
@@ -40,39 +40,20 @@ using namespace MARTe;
 /*---------------------------------------------------------------------------*/
 
 /**
- * @brief This GAM generates sine waveforms
- *
- * @details The user can set the following input signals which can be arrays in case more than one sine waveform is produced in output. The number of elements of
- * the following signals shall be equal to the number of output signals.
- * - Amplitude: float32 signal amplitude
- * - Phase: float32 signal phase
- * - Offset: float32 signal offset
- * - Frequency: float32 signal frequency
- * The last input signal is the input time, which is uint64 and shall be scalar.
- * Each output signal i is a sine wave generated with input signals[i]. The output signals can be array and if so the configuration parameter SampleTimeUs shall be
- * set and the sample time will be used to generate all the samples of the sine vector in output.
- *
- * @details The user can configure the following signals:
- * - SampleTimeUs: to be defined if output sine waves are vectors. Defauls is 0 (not used)
- * - InputMin: the minimum possible value of the sine wave. Default is -1
- * - InputMax: the maximum possible value of the sine wave. Default is 1
- * - OutputMin: the real signal output, to be mapped to InputMin. Default is 0
- * - OutputMax: the real signal output, to be mapped to InputMax. Default is 4095
- * By defining the parameters above, we can directly output the GAM output to the STM32 DAC which takes a value between 0 and 4095.
  */
-class SineGeneratorGAM: public GAM {
+class MotorControlGAM: public GAM {
 public:
     CLASS_REGISTER_DECLARATION()
 
     /**
      * @brief Constructor
      */
-    SineGeneratorGAM();
+    MotorControlGAM();
 
     /**
      * @brief Destructor
      */
-    virtual ~SineGeneratorGAM();
+    virtual ~MotorControlGAM();
 
     /**
      * @brief Initialises the GAM.
@@ -92,65 +73,41 @@ public:
 
 private:
 
-    /**
-     * The sine waves amplitudes in input
-     */
-    float32 *amplitude;
+    uint32 numberOfMotors;
 
-    /**
-     * The sine waves phases in input
-     */
-    float32 *phase;
+    uint8 *directionPin;
 
-    /**
-     * The sine waves offsets in input
-     */
-    float32 *offset;
+    int32 *reference;
 
-    /**
-     * The sine waves frequencies in input
-     */
-    float32 *frequency;
+    int32 *measure;
 
-    /**
-     * The input time
-     */
+    float32 *output;
+
+    uint32 *pwm;
+
+    uint32 *directionMask;
+
     uint64 *timestampUs;
 
-    /**
-     * The output sine waveform
-     */
-    uint16 *sine;
+    uint64 timestamp_1;
 
-    /**
-     * The sample time defined by the user
-     */
-    uint32 sampleTime;
+    float32 *iError;
 
-    /**
-     * The number of samples to be generated for each sine output
-     */
-    uint32 numberOfSineElements;
+    int32 *error_1;
 
-    /**
-     * Minimum sine value
-     */
-    float32 inputMin;
+    float32 kp;
 
-    /**
-     * Maximum sine value
-     */
-    float32 inputMax;
+    float32 ki;
 
-    /**
-     * Minimum output signal value
-     */
-    uint16 outputMin;
+    float32 kd;
 
-    /**
-     * Maximum output signal value
-     */
-    uint16 outputMax;
+    float32 outMax;
+
+    uint32 *pwmMin;
+
+    uint32 pwmMax;
+
+    int32 deadBand;
 };
 
 /*---------------------------------------------------------------------------*/

@@ -74,7 +74,7 @@ bool EncoderDataSource::Synchronise() {
     }
 
     uint16 innerCounter = __HAL_TIM_GET_COUNTER(encoderHandle);
-    REPORT_ERROR(ErrorManagement::Information, "Counter %d", innerCounter);
+    //REPORT_ERROR(ErrorManagement::Information, "Counter %d", innerCounter);
 
     int32 delta = (int32)((int16)(innerCounter - lastCounter));
     lastCounter = innerCounter;

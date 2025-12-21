@@ -98,6 +98,7 @@ bool PwmDataSource::Synchronise() {
 
 bool PwmDataSource::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
     bool ret = MemoryDataSourceI::SetConfiguredDatabase(data);
+    signalsDatabase.MoveAbsolute("Signals");
     ret = (numberOfSignals <= 4u);
     if (ret) {
         for (uint32 i = 0u; (i < numberOfSignals) && ret; i++) {
@@ -112,12 +113,13 @@ bool PwmDataSource::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
                     }
                 }
                 if (ret) {
-                    ret = MoveToSignalIndex(i);
+                    ret = signalsDatabase.MoveToChild(i);
                     if (ret) {
-                        if (!configuredDatabase.Read("Channel", channel[i])) {
+                        if (!signalsDatabase.Read("Channel", channel[i])) {
                             channel[i] = i;
                             REPORT_ERROR(ErrorManagement::Warning, "Channel not defined for signal %d. Set to %d", i, channel[i]);
                         }
+                        signalsDatabase.MoveToAncestor(1u);
                     }
                 }
             } else {

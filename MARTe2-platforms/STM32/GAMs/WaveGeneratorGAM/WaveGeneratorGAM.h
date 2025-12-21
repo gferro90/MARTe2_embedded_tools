@@ -39,6 +39,11 @@ using namespace MARTe;
 /*                           Class declaration                               */
 /*---------------------------------------------------------------------------*/
 
+/**
+ * @brief This GAM generates waveforms
+ *
+ * @
+ */
 class WaveGeneratorGAM: public GAM {
 public:
     CLASS_REGISTER_DECLARATION()
