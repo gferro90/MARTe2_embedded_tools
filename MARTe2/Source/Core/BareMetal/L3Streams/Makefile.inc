@@ -35,7 +35,6 @@ OBJSX=	BufferedStreamI.x \
 		IOBufferStandardPrint.x \
 		IOBufferJsonPrint.x \
 		IOBufferXMLPrint.x \
-		JsonPrinter.x\
 		PrinterI.x\
 		ReferenceContainer.x \
 		SingleBufferedStream.x \
@@ -44,8 +43,7 @@ OBJSX=	BufferedStreamI.x \
 		StreamStructuredDataI.x\
 		StreamStructuredData.x\
 		StreamString.x \
-		StreamStringIOBuffer.x\
-		XMLPrinter.x
+		StreamStringIOBuffer.x
         
 PACKAGE=Core/BareMetal
 ROOT_DIR=../../../..

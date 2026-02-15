@@ -77,6 +77,12 @@ private:
 
     uint8 *directionPin;
 
+    uint8 *endSwitchPin;
+
+    uint32 *endSwitchOut;
+
+    uint32 *endSwitches;
+
     int32 *reference;
 
     int32 *measure;
@@ -108,6 +114,8 @@ private:
     uint32 pwmMax;
 
     int32 deadBand;
+
+    int8 *errorAtSwitch;
 };
 
 /*---------------------------------------------------------------------------*/

@@ -28,21 +28,13 @@ OBJSX=BrokerI.x \
     DataSourceI.x \
     ExecutableI.x \
     GAM.x \
-    GAMGroup.x \
-    GAMBareScheduler.x \
     GAMSchedulerI.x \
     GAMDataSource.x \
     MemoryDataSourceI.x \
     MemoryMapBroker.x \
-    MemoryMapInterpolatedInputBroker.x \
-    MemoryMapMultiBufferBroker.x \
-    MemoryMapMultiBufferInputBroker.x \
-    MemoryMapMultiBufferOutputBroker.x \
     MemoryMapInputBroker.x \
     MemoryMapOutputBroker.x \
     MemoryMapSynchronisedInputBroker.x \
-    MemoryMapSynchronisedMultiBufferInputBroker.x \
-    MemoryMapSynchronisedMultiBufferOutputBroker.x \
     MemoryMapSynchronisedOutputBroker.x \
     RealTimeApplication.x \
     RealTimeApplicationConfigurationBuilder.x \

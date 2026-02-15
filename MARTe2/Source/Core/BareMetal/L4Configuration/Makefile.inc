@@ -56,7 +56,6 @@ OBJSX=	AnyObject.x \
 		FloatToInteger.x \
 		IntegerToFloat.x \
 		IntrospectionStructure.x \
-		JsonParser.x \
 		LexicalAnalyzer.x \
 		StringToFloat.x \
 		StringToInteger.x \
@@ -65,8 +64,7 @@ OBJSX=	AnyObject.x \
 		Token.x \
 		ParserI.x \
 		StandardParser.x \
-		ValidateBasicType.x \
-		XMLParser.x
+		ValidateBasicType.x
         
 PACKAGE=Core/BareMetal
 ROOT_DIR=../../../..

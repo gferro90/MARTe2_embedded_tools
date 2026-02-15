@@ -24,7 +24,8 @@
 #
 #############################################################
 OBJSX= 
-SPB    = L0Types.x L1Portability.x L2Objects.x L3Streams.x L4Configuration.x L4Logger.x L4Messages.x L4HttpService.x L5GAMs.x L6App.x
+SPB    = L0Types.x L1Portability.x L2Objects.x L3Streams.x L4Configuration.x L4Messages.x L5GAMs.x 
+#L4HttpService.x L4Logger.x L6App.x
 
 PACKAGE=Core
 MARTe2_MAKEDEFAULT_DIR?=../../../MakeDefaults

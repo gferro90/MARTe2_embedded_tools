@@ -146,7 +146,6 @@ bool TimerDataSource::GetInputBrokers(ReferenceContainer &inputBrokers, const ch
         REPORT_ERROR(ErrorManagement::Information, "TimerDataSource::GetInputBrokers 1");
         ret = inputBrokers.Insert(broker);
     }
-    REPORT_ERROR_PARAMETERS(ErrorManagement::FatalError, "TimerDataSource::GetInputBrokers exit with %d", ret);
 
     return ret;
 }
