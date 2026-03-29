@@ -91,6 +91,8 @@ private:
 
     uint32 *pwm;
 
+    int32 *position;
+
     uint32 *directionMask;
 
     uint64 *timestampUs;
@@ -101,11 +103,11 @@ private:
 
     int32 *error_1;
 
-    float32 kp;
+    float32 *kp;
 
-    float32 ki;
+    float32 *ki;
 
-    float32 kd;
+    float32 *kd;
 
     float32 outMax;
 

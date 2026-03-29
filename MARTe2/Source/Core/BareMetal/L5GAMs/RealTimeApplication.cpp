@@ -53,13 +53,7 @@ namespace MARTe {
 /*---------------------------------------------------------------------------*/
 
 RealTimeApplication::RealTimeApplication() :
-        ReferenceContainer(), MessageI() {
-    filter = ReferenceT<RegisteredMethodsMessageFilter>(GlobalObjectsDatabase::Instance()->GetStandardHeap());
-    filter->SetDestination(this);
-    ErrorManagement::ErrorType ret = MessageI::InstallMessageFilter(filter);
-    if (!ret.ErrorsCleared()) {
-        REPORT_ERROR(ErrorManagement::FatalError, "Failed to install message filters");
-    }
+        ReferenceContainer() {
     defaultDataSourceName = "";
     index=1u;
 
@@ -553,8 +547,5 @@ void RealTimeApplication::Purge(ReferenceContainer &purgeList) {
 
 CLASS_REGISTER(RealTimeApplication, "1.0")
 
-CLASS_METHOD_REGISTER(RealTimeApplication, PrepareNextState)
-CLASS_METHOD_REGISTER(RealTimeApplication, StartNextStateExecution)
-CLASS_METHOD_REGISTER(RealTimeApplication, StopCurrentStateExecution)
 
 }

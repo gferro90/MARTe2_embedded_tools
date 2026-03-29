@@ -38,7 +38,6 @@
 #include "ReferenceContainer.h"
 #include "ReferenceT.h"
 #include "StatefulI.h"
-#include "TimingDataSource.h"
 
 /*---------------------------------------------------------------------------*/
 /*                           Class declaration                               */
@@ -231,11 +230,6 @@ protected:
      * The name of the TimingDataSource where the execution times are to be stored.
      */
     StreamString timingDataSourceAddress;
-
-    /**
-     * The TimingDataSource where the execution times are to be stored.
-     */
-    ReferenceT<TimingDataSource> timingDataSource;
 
     /**
      * List of all the possible application states.

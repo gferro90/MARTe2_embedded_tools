@@ -44,8 +44,7 @@ OBJSX=BrokerI.x \
     RealTimeApplication.x \
     RealTimeApplicationConfigurationBuilder.x \
     RealTimeState.x \
-    RealTimeThread.x \
-    TimingDataSource.x
+    RealTimeThread.x
 
 PACKAGE=Core/BareMetal
 ROOT_DIR=../../../..

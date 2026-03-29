@@ -85,51 +85,6 @@ extern bool PrintStandardCloseBlock(IOBuffer &iobuff);
 
 extern bool PrintStandardOpenAssignment(IOBuffer &iobuff, const char8 * const varName);
 
-// Json print functions implemented in IOBufferStandardPrint.cpp
-
-extern bool PrintJsonOpenMatrix(IOBuffer &iobuff);
-
-extern bool PrintJsonCloseMatrix(IOBuffer &iobuff);
-
-extern bool PrintJsonScalarSeparator(IOBuffer &iobuff);
-
-extern bool PrintJsonVectorSeparator(IOBuffer &iobuff);
-
-extern bool PrintJsonVariableSeparator(IOBuffer &iobuff);
-
-extern bool PrintJsonBlockSeparator(IOBuffer &iobuff);
-
-extern bool PrintJsonOpenVector(IOBuffer &iobuff);
-
-extern bool PrintJsonCloseVector(IOBuffer &iobuff);
-
-extern bool PrintJsonOpenBlock(IOBuffer &iobuff, const char8 * const blockName);
-
-extern bool PrintJsonCloseBlock(IOBuffer &iobuff);
-
-extern bool PrintJsonOpenAssignment(IOBuffer &iobuff, const char8 * const varName);
-
-// XML print functions implemented in IOBufferStandardPrint.cpp
-
-extern bool PrintXMLOpenMatrix(IOBuffer &iobuff);
-
-extern bool PrintXMLCloseMatrix(IOBuffer &iobuff);
-
-extern bool PrintXMLScalarSeparator(IOBuffer &iobuff);
-
-extern bool PrintXMLVectorSeparator(IOBuffer &iobuff);
-
-extern bool PrintXMLOpenVector(IOBuffer &iobuff);
-
-extern bool PrintXMLCloseVector(IOBuffer &iobuff);
-
-extern bool PrintXMLOpenBlock(IOBuffer &iobuff, const char8 * const blockName);
-
-extern bool PrintXMLCloseBlock(IOBuffer &iobuff, const char8 * const blockName);
-
-extern bool PrintXMLOpenAssignment(IOBuffer &iobuff, const char8 * const varName);
-
-extern bool PrintXMLCloseAssignment(IOBuffer &iobuff, const char8 * const varName);
 
 /*---------------------------------------------------------------------------*/
 /*                           Static definitions                              */
@@ -145,12 +100,6 @@ bool PrintOpenMatrix(IOBuffer &iobuff, const FormatDescriptor &fd) {
     bool ret = false;
     if (fd.desiredGrammar == PrintInStandardGrammar) {
         ret = PrintStandardOpenMatrix(iobuff);
-    }
-    else if (fd.desiredGrammar == PrintInJsonGrammar) {
-        ret = PrintJsonOpenMatrix(iobuff);
-    }
-    else if (fd.desiredGrammar == PrintInXMLGrammar) {
-        ret = PrintXMLOpenMatrix(iobuff);
     }
     else {
         ret = false;
@@ -170,12 +119,6 @@ bool PrintCloseMatrix(IOBuffer &iobuff, const FormatDescriptor &fd) {
     if (fd.desiredGrammar == PrintInStandardGrammar) {
         ret = PrintStandardCloseMatrix(iobuff);
     }
-    else if (fd.desiredGrammar == PrintInJsonGrammar) {
-        ret = PrintJsonCloseMatrix(iobuff);
-    }
-    else if (fd.desiredGrammar == PrintInXMLGrammar) {
-        ret = PrintXMLCloseMatrix(iobuff);
-    }
     else {
         ret = false;
     }
@@ -193,12 +136,6 @@ bool PrintScalarSeparator(IOBuffer &iobuff, const FormatDescriptor &fd) {
     bool ret = false;
     if (fd.desiredGrammar == PrintInStandardGrammar) {
         ret = true;
-    }
-    else if (fd.desiredGrammar == PrintInJsonGrammar) {
-        ret = PrintJsonScalarSeparator(iobuff);
-    }
-    else if (fd.desiredGrammar == PrintInXMLGrammar) {
-        ret = PrintXMLScalarSeparator(iobuff);
     }
     else {
         ret = false;
@@ -218,12 +155,6 @@ bool PrintVectorSeparator(IOBuffer &iobuff, const FormatDescriptor &fd) {
     if (fd.desiredGrammar == PrintInStandardGrammar) {
         ret = true;
     }
-    else if (fd.desiredGrammar == PrintInJsonGrammar) {
-        ret = PrintJsonVectorSeparator(iobuff);
-    }
-    else if (fd.desiredGrammar == PrintInXMLGrammar) {
-        ret = PrintXMLVectorSeparator(iobuff);
-    }
     else {
         ret = false;
     }
@@ -240,12 +171,6 @@ bool PrintVariableSeparator(IOBuffer &iobuff, const FormatDescriptor &fd) {
 
     bool ret = false;
     if (fd.desiredGrammar == PrintInStandardGrammar) {
-        ret = true;
-    }
-    else if (fd.desiredGrammar == PrintInJsonGrammar) {
-        ret = PrintJsonVariableSeparator(iobuff);
-    }
-    else if (fd.desiredGrammar == PrintInXMLGrammar) {
         ret = true;
     }
     else {
@@ -266,12 +191,6 @@ bool PrintBlockSeparator(IOBuffer &iobuff, const FormatDescriptor &fd) {
     if (fd.desiredGrammar == PrintInStandardGrammar) {
         ret = true;
     }
-    else if (fd.desiredGrammar == PrintInJsonGrammar) {
-        ret = PrintJsonBlockSeparator(iobuff);
-    }
-    else if (fd.desiredGrammar == PrintInXMLGrammar) {
-        ret = true;
-    }
     else {
         ret = false;
     }
@@ -289,12 +208,6 @@ bool PrintOpenVector(IOBuffer &iobuff, const FormatDescriptor &fd) {
     bool ret = false;
     if (fd.desiredGrammar == PrintInStandardGrammar) {
         ret = PrintStandardOpenVector(iobuff);
-    }
-    else if (fd.desiredGrammar == PrintInJsonGrammar) {
-        ret = PrintJsonOpenVector(iobuff);
-    }
-    else if (fd.desiredGrammar == PrintInXMLGrammar) {
-        ret = PrintXMLOpenVector(iobuff);
     }
     else {
         ret = false;
@@ -314,12 +227,6 @@ bool PrintCloseVector(IOBuffer &iobuff, const FormatDescriptor &fd) {
     if (fd.desiredGrammar == PrintInStandardGrammar) {
         ret = PrintStandardCloseVector(iobuff);
     }
-    else if (fd.desiredGrammar == PrintInJsonGrammar) {
-        ret = PrintJsonCloseVector(iobuff);
-    }
-    else if (fd.desiredGrammar == PrintInXMLGrammar) {
-        ret = PrintXMLCloseVector(iobuff);
-    }
     else {
         ret = false;
     }
@@ -337,12 +244,6 @@ bool PrintOpenBlock(IOBuffer &iobuff, const char8 * const blockName, const Forma
     bool ret = false;
     if (fd.desiredGrammar == PrintInStandardGrammar) {
         ret = PrintStandardOpenBlock(iobuff, blockName);
-    }
-    else if (fd.desiredGrammar == PrintInJsonGrammar) {
-        ret = PrintJsonOpenBlock(iobuff, blockName);
-    }
-    else if (fd.desiredGrammar == PrintInXMLGrammar) {
-        ret = PrintXMLOpenBlock(iobuff, blockName);
     }
     else {
         ret = false;
@@ -362,12 +263,6 @@ bool PrintCloseBlock(IOBuffer &iobuff, const char8 * const varName, const Format
     bool ret = false;
     if (fd.desiredGrammar == PrintInStandardGrammar) {
         ret = PrintStandardCloseBlock(iobuff);
-    }
-    else if (fd.desiredGrammar == PrintInJsonGrammar) {
-        ret = PrintJsonCloseBlock(iobuff);
-    }
-    else if (fd.desiredGrammar == PrintInXMLGrammar) {
-        ret = PrintXMLCloseBlock(iobuff, varName);
     }
     else {
         ret = false;
@@ -389,12 +284,6 @@ bool PrintOpenAssignment(IOBuffer &iobuff, const char8 * const varName, const Fo
     if (fd.desiredGrammar == PrintInStandardGrammar) {
         ret = PrintStandardOpenAssignment(iobuff, varName);
     }
-    else if (fd.desiredGrammar == PrintInJsonGrammar) {
-        ret = PrintJsonOpenAssignment(iobuff, varName);
-    }
-    else if (fd.desiredGrammar == PrintInXMLGrammar) {
-        ret = PrintXMLOpenAssignment(iobuff, varName);
-    }
     else {
         ret = false;
     }
@@ -414,12 +303,6 @@ bool PrintCloseAssignment(IOBuffer &iobuff, const char8 * const varName, const F
     bool ret = false;
     if (fd.desiredGrammar == PrintInStandardGrammar) {
         ret = true;
-    }
-    else if (fd.desiredGrammar == PrintInJsonGrammar) {
-        ret = true;
-    }
-    else if (fd.desiredGrammar == PrintInXMLGrammar) {
-        ret = PrintXMLCloseAssignment(iobuff, varName);
     }
     else {
         ret = false;

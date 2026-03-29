@@ -23,7 +23,7 @@
 # $Id: Makefile.inc 3 2012-01-15 16:26:07Z aneto $
 #
 #############################################################
-OBJSX=GpioDataSource.x
+OBJSX=LS7366RDataSource.x 
 
 SPB =
 PACKAGE = DataSources
@@ -58,7 +58,7 @@ INCLUDES += -I$(STM_CUBE_FW_DIR)/Drivers/CMSIS/Device/ST/$(DRIVER_PLATFORM)/Incl
 
 
 all: $(OBJS) $(SUBPROJ) \
-	$(BUILD_DIR)/GpioDataSource$(LIBEXT)
+	$(BUILD_DIR)/LS7366RDataSource$(LIBEXT)
 
 include $(MAKEDEFAULTDIR)/MakeStdLibRules.$(TARGET)
 

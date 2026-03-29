@@ -32,9 +32,7 @@
 /*                        Project header includes                            */
 /*---------------------------------------------------------------------------*/
 #include "ConfigurationDatabase.h"
-#include "CLASSMETHODREGISTER.h"
 #include "GAMSchedulerI.h"
-#include "MessageI.h"
 #include "RealTimeApplicationConfigurationBuilder.h"
 #include "ReferenceContainer.h"
 #include "ReferenceT.h"
@@ -102,7 +100,7 @@ namespace MARTe {
  * </pre>
  */
 /*lint -e{9109} RealTimeApplication is forward declared in RealTimeApplicationConfigurationBuilder.*/
-class DLL_API RealTimeApplication: public ReferenceContainer, public MessageI {
+class DLL_API RealTimeApplication: public ReferenceContainer {
 public:
     CLASS_REGISTER_DECLARATION()
 
@@ -300,11 +298,6 @@ private:
      * The default data source name to be used when this is not specified in the Signals.
      */
     StreamString defaultDataSourceName;
-
-    /**
-     * Filter to receive the RPC
-     */
-    ReferenceT<RegisteredMethodsMessageFilter> filter;
 
 };
 

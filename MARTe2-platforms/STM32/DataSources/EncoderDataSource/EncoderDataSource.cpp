@@ -26,18 +26,20 @@
 #include "HandleDatabase.h"
 
 EncoderDataSource::EncoderDataSource() :
-        MemoryDataSourceI() {
+        DataSourceI() {
     //Initialisation already done by the tool !!!
     encoderHandle = NULL;
     lastCounter = 0u;
     invert = 0u;
+    counter = 0;
+    reset = 0u;
 }
 
 EncoderDataSource::~EncoderDataSource() {
 }
 
 bool EncoderDataSource::Initialise(StructuredDataI &data) {
-    bool ret = MemoryDataSourceI::Initialise(data);
+    bool ret = DataSourceI::Initialise(data);
     if (ret) {
         StreamString encoderId;
         ret = data.Read("Identifier", encoderId);
@@ -65,27 +67,25 @@ bool EncoderDataSource::Initialise(StructuredDataI &data) {
 
 bool EncoderDataSource::Synchronise() {
     //first signal is reset
-    uint8 *reset = memory;
-    int32 *counter = (int32*) (&memory[1]);
 
-    if ((*reset) > 0) {
+    if (reset > 0u) {
         __HAL_TIM_SET_COUNTER(encoderHandle, 0);
-        *counter = 0;
+        counter = 0;
     }
 
     uint16 innerCounter = __HAL_TIM_GET_COUNTER(encoderHandle);
-    //REPORT_ERROR(ErrorManagement::Information, "Counter %d", innerCounter);
 
     int32 delta = (int32)((int16)(innerCounter - lastCounter));
     lastCounter = innerCounter;
 
-    (*counter) += (invert > 0u) ? (-delta) : (delta);
+    counter += (invert > 0u) ? (-delta) : (delta);
+    //REPORT_ERROR(ErrorManagement::Information, "Counter %d", counter);
 
     return true;
 }
 
 bool EncoderDataSource::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
-    bool ret = MemoryDataSourceI::SetConfiguredDatabase(data);
+    bool ret = DataSourceI::SetConfiguredDatabase(data);
     if (ret) {
         ret = (numberOfSignals == 2u);
     }
@@ -128,9 +128,27 @@ const char8* EncoderDataSource::GetBrokerName(StructuredDataI &data, const Signa
     return "";
 }
 
+
+
+bool EncoderDataSource::GetSignalMemoryBuffer(const uint32 signalIdx, const uint32 bufferIdx, void *&signalAddress) {
+    bool ret = true;
+    if (signalIdx == 0u) {
+        signalAddress = &reset;
+    } else if (signalIdx == 1u) {
+        signalAddress = &counter;
+    } else {
+        ret = false;
+    }
+    return ret;
+}
+
+bool EncoderDataSource::AllocateMemory(){
+    return true;
+}
+
+
 bool EncoderDataSource::PrepareNextState(const MARTe::char8 *const currentStateName, const MARTe::char8 *const nextStateName) {
-    int32 *counter = (int32*) (&memory[1]);
-    *counter = 0;
+    counter = 0;
 
     __HAL_TIM_SET_COUNTER(encoderHandle, 0);
     HAL_TIM_Encoder_Start(encoderHandle, TIM_CHANNEL_ALL);

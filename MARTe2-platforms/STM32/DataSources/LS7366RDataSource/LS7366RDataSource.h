@@ -1,6 +1,6 @@
 /**
- * @file EncoderDataSource.h
- * @brief Header file for class EncoderDataSource
+ * @file LS7366RDataSource.h
+ * @brief Header file for class LS7366RDataSource
  * @date 08/nov/2025
  * @author pc
  *
@@ -16,15 +16,15 @@
  * basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the Licence permissions and limitations under the Licence.
 
- * @details This header file contains the declaration of the class EncoderDataSource
+ * @details This header file contains the declaration of the class LS7366RDataSource
  * with all of its public, protected and private members. It may also include
  * definitions for inline methods which need to be visible to the compiler.
  */
 
-#ifndef ENCODERDATASOURCE_H_
-#define ENCODERDATASOURCE_H_
+#ifndef LS7366DATASOURCE_H_
+#define LS7366DATASOURCE_H_
 
-#include "DataSourceI.h"
+#include "MemoryDataSourceI.h"
 #include QUOTE(_HAL_H)
 
 
@@ -36,7 +36,7 @@ using namespace MARTe;
  * @details This data source is used to read encoder pulses and increment the counter accordingly. The encoder has been configured to count on both edges and on both channels (x4 configuration)
  * The uint16 counter is converted to int32 signal. The first signal of this data source is to reset the counter.
  */
-class EncoderDataSource : public DataSourceI {
+class LS7366RDataSource : public DataSourceI {
 public:
 
     CLASS_REGISTER_DECLARATION()
@@ -44,12 +44,12 @@ public:
     /**
      * @brief Constructor
      */
-    EncoderDataSource();
+    LS7366RDataSource();
 
     /**
      * @brief Destructor
      */
-    virtual ~EncoderDataSource();
+    virtual ~LS7366RDataSource();
 
     /**
      * @brief Configures the data source
@@ -60,20 +60,9 @@ public:
     virtual bool Initialise(StructuredDataI &data);
 
     /**
-     * @brief Resets the counter if the first signal is 1. Reads the counter.
-     */
-    virtual bool Synchronise();
-
-    /**
      * @brief Checks that the first (reset) signal is uint8 and that the second (counter) signal is int32
      */
     virtual bool SetConfiguredDatabase(MARTe::StructuredDataI & data);
-
-    /**
-     * @brief Return MemoryMapSynchronisedOutputBroker if direction is output and MemoryMapInputBroker if direction is input.
-     */
-    virtual const char8 *GetBrokerName(StructuredDataI &data,
-            const SignalDirection direction);
 
     /**
      * @brief Returns the internal memory
@@ -85,16 +74,25 @@ public:
      */
     virtual bool AllocateMemory();
 
+
+    /**
+     * @brief Resets the counter if the first signal is 1. Reads the counter.
+     */
+    virtual bool Synchronise();
+
+
+    /**
+     * @brief Return MemoryMapSynchronisedOutputBroker if direction is output and MemoryMapInputBroker if direction is input.
+     */
+    virtual const char8 *GetBrokerName(StructuredDataI &data,
+            const SignalDirection direction);
+
     /**
      * @brief Starts the timer and resets the encoder counter
      */
     virtual bool PrepareNextState(const char8 * const currentStateName,
             const char8 * const nextStateName);
 
-    /**
-     * @brief Retrieves the Timer handle
-     */
-    TIM_HandleTypeDef * GetHwHandle();
 
 
 private:
@@ -102,16 +100,18 @@ private:
     /**
      * The timer PWM handle
      */
-    TIM_HandleTypeDef *encoderHandle;
+    SPI_HandleTypeDef *spiHandle;
 
-    uint16 lastCounter;
+    GPIO_TypeDef *gpioSelector;
 
-    uint8 invert;
-
-    int32 counter;
+    uint8 selectorPin;
 
     uint8 reset;
 
+    int32 counter;
+
+    uint8 invert;
+
 };
 
-#endif /* ENCODERDATASOURCE_H_ */
+#endif /* LS7366DATASOURCE_H_ */

@@ -24,7 +24,7 @@
 #
 #############################################################
 
-OBJSX=	BufferedStreamI.x \
+#OBJSX=	BufferedStreamI.x \
 		Base64Encoder.x\
 		BufferedStreamIOBuffer.x \
 		CharBuffer.x \
@@ -44,7 +44,25 @@ OBJSX=	BufferedStreamI.x \
 		StreamStructuredData.x\
 		StreamString.x \
 		StreamStringIOBuffer.x
-        
+
+OBJSX=	BufferedStreamI.x \
+		Base64Encoder.x\
+		BufferedStreamIOBuffer.x \
+		CharBuffer.x \
+		DoubleBufferedStream.x \
+		IOBuffer.x \
+		IOBufferFloatPrint.x \
+		IOBufferIntegerPrint.x \
+		IOBufferStandardPrint.x \
+		PrinterI.x\
+		ReferenceContainer.x \
+		SingleBufferedStream.x \
+		StandardPrinter.x\
+		StreamMemoryReference.x \
+		StreamString.x \
+		StreamStringIOBuffer.x
+
+
 PACKAGE=Core/BareMetal
 ROOT_DIR=../../../..
 MARTe2_MAKEDEFAULT_DIR?=$(ROOT_DIR)/MakeDefaults

@@ -54,6 +54,7 @@ MotorControlGAM::MotorControlGAM() :
     output = NULL;
     directionMask = NULL;
     endSwitchOut = NULL;
+    position = NULL;
 
     error_1 = 0;
     iError = 0;
@@ -64,9 +65,9 @@ MotorControlGAM::MotorControlGAM() :
     error_1 = NULL;
     iError = NULL;
 
-    kp = 0.;
-    ki = 0.;
-    kd = 0.;
+    kp = NULL;
+    ki = NULL;
+    kd = NULL;
 
     outMax = 24000.;
     pwmMin = NULL;
@@ -95,29 +96,19 @@ MotorControlGAM::~MotorControlGAM() {
     if (errorAtSwitch != NULL) {
         delete[] iError;
     }
-
+    if (kp != NULL) {
+        delete[] kp;
+    }
+    if (ki != NULL) {
+        delete[] ki;
+    }
+    if (kd != NULL) {
+        delete[] kd;
+    }
 }
 
 bool MotorControlGAM::Initialise(StructuredDataI &data) {
     bool ret = GAM::Initialise(data);
-    if (ret) {
-        ret = data.Read("Kp", kp);
-        if (!ret) {
-            REPORT_ERROR(ErrorManagement::InitialisationError, "Please define PID Kp");
-        }
-    }
-    if (ret) {
-        ret = data.Read("Ki", ki);
-        if (!ret) {
-            REPORT_ERROR(ErrorManagement::InitialisationError, "Please define PID Ki");
-        }
-    }
-    if (ret) {
-        ret = data.Read("Kd", kd);
-        if (!ret) {
-            REPORT_ERROR(ErrorManagement::InitialisationError, "Please define PID Kd");
-        }
-    }
     if (ret) {
         if (!data.Read("MaxOutput", outMax)) {
             outMax = 24000.;
@@ -137,12 +128,9 @@ bool MotorControlGAM::Initialise(StructuredDataI &data) {
 }
 
 bool MotorControlGAM::Setup() {
-    bool ret = (numberOfInputSignals == 4u);
-    if (!ret) {
-        REPORT_ERROR(ErrorManagement::InitialisationError, "The number of input signals shall be equal to 3");
-    }
+    bool ret = true;
     if (ret) {
-        GetSignalNumberOfElements(InputSignals, 2u, numberOfMotors);
+        GetSignalNumberOfElements(OutputSignals, 2u, numberOfMotors);
 
         iError = new float32[numberOfMotors];
         error_1 = new int32[numberOfMotors];
@@ -150,40 +138,10 @@ bool MotorControlGAM::Setup() {
         endSwitchPin = new uint8[2 * numberOfMotors];
         pwmMin = new uint32[numberOfMotors];
         errorAtSwitch = new int8[numberOfMotors];
+        kp = new float32[numberOfMotors];
+        ki = new float32[numberOfMotors];
+        kd = new float32[numberOfMotors];
 
-        uint32 numberOfMeasures = 0u;
-        GetSignalNumberOfElements(InputSignals, 3u, numberOfMeasures);
-        ret = (numberOfMotors == numberOfMeasures);
-        if (!ret) {
-            REPORT_ERROR(ErrorManagement::InitialisationError, "The number of elements of input signals 2 and 3 must be equal");
-        }
-    }
-    if (ret) {
-        ret = (numberOfOutputSignals >= 4);
-        if (!ret) {
-            REPORT_ERROR(ErrorManagement::InitialisationError, "The number of output signals shall be equal or greater than 4");
-        }
-    }
-    if (ret) {
-        ret = ((numberOfOutputSignals - 3u) == numberOfMotors);
-        if (!ret) {
-            REPORT_ERROR(ErrorManagement::InitialisationError, "The number of output signals shall be equal to number of motors +3");
-        }
-    }
-    if (ret) {
-        uint32 numberOfControls = 0u;
-        GetSignalNumberOfElements(OutputSignals, 2u, numberOfControls);
-
-        ret = (numberOfMotors == numberOfControls);
-        if (!ret) {
-            REPORT_ERROR(ErrorManagement::InitialisationError, "The number of elements input and output signal 2 must be equal");
-        }
-    }
-    if (ret) {
-        ret = (numberOfMotors <= 4u);
-        if (!ret) {
-            REPORT_ERROR(ErrorManagement::InitialisationError, "The number of elements input and output signal 1 must be equal");
-        }
     }
     if (ret) {
         TypeDescriptor td = GetSignalType(InputSignals, 0u);
@@ -204,11 +162,11 @@ bool MotorControlGAM::Setup() {
             if (!ret) {
                 REPORT_ERROR(ErrorManagement::FatalError, "The type of input signal %d must be int32", i);
             }
-            if (i < numberOfMotors) {
-                iError[i] = 0.;
-                error_1[i] = 0;
-                errorAtSwitch = 0;
-            }
+        }
+        for (uint32 i = 0u; (i < numberOfMotors) && ret; i++) {
+            iError[i] = 0.;
+            error_1[i] = 0;
+            errorAtSwitch = 0;
         }
     }
     if (ret) {
@@ -216,6 +174,12 @@ bool MotorControlGAM::Setup() {
         endSwitches = (uint32*) (inputSignalsMemoryIndexer[1]);
         reference = (int32*) (inputSignalsMemoryIndexer[2]);
         measure = (int32*) (inputSignalsMemoryIndexer[3]);
+    }
+    if (ret) {
+        ret = (numberOfOutputSignals >= 5);
+        if (!ret) {
+            REPORT_ERROR(ErrorManagement::InitialisationError, "The number of output signals shall be equal or greater than 5");
+        }
     }
     if (ret) {
         TypeDescriptor td = GetSignalType(OutputSignals, 0u);
@@ -232,7 +196,10 @@ bool MotorControlGAM::Setup() {
             if (ret) {
                 Vector<uint8> directioPinVec(directionPin, numberOfMotors);
                 signalsDatabase.MoveToChild(1u);
-                signalsDatabase.Read("DirectionPins", directioPinVec);
+                ret = signalsDatabase.Read("DirectionPins", directioPinVec);
+                if (!ret) {
+                    REPORT_ERROR(ErrorManagement::FatalError, "Unable to read DirectionPins");
+                }
             }
         } else {
             REPORT_ERROR(ErrorManagement::FatalError, "The type of output signal 1 must be uint32");
@@ -242,20 +209,50 @@ bool MotorControlGAM::Setup() {
             if (ret) {
                 Vector<uint8> endSwitchPinVec(endSwitchPin, 2 * numberOfMotors);
                 signalsDatabase.MoveToChild(1u);
-                signalsDatabase.Read("EndSwitchPins", endSwitchPinVec);
+                ret = signalsDatabase.Read("EndSwitchPins", endSwitchPinVec);
+                if (!ret) {
+                    REPORT_ERROR(ErrorManagement::FatalError, "Unable to read EndSwitchPins");
+                }
             }
         }
         if (ret) {
             TypeDescriptor td = GetSignalType(OutputSignals, 2u);
             ret = (td == Float32Bit);
             if (!ret) {
-                REPORT_ERROR(ErrorManagement::FatalError, "The type of output signal 1 must be float32");
+                REPORT_ERROR(ErrorManagement::FatalError, "The type of output signal 2 must be float32");
+            }
+        }
+        if (ret) {
+            TypeDescriptor td = GetSignalType(OutputSignals, 3u);
+            ret = (td == SignedInteger32Bit);
+            if (!ret) {
+                REPORT_ERROR(ErrorManagement::FatalError, "The type of output signal 3 must be int32");
+            }
+        }
+        if (ret) {
+            uint32 numberOfMeasures = 0u;
+            GetSignalNumberOfElements(OutputSignals, 3u, numberOfMeasures);
+
+            ret = (numberOfMotors == numberOfMeasures);
+            if (!ret) {
+                REPORT_ERROR(ErrorManagement::InitialisationError, "The number of elements of output signal 3 must be equal to the number of motors");
             }
         }
         signalsDatabase.MoveAbsolute("OutputSignals");
-        for (uint32 i = 3u; (i < numberOfOutputSignals) && ret; i++) {
+        for (uint32 i = 4u; (i < numberOfOutputSignals) && ret; i++) {
             if (signalsDatabase.MoveToChild(i)) {
-                signalsDatabase.Read("PwmMin", pwmMin[i - 3u]);
+                signalsDatabase.Read("PwmMin", pwmMin[i - 4u]);
+                ret = signalsDatabase.Read("Kp", kp[i - 4u]);
+                if (ret) {
+                    if (!signalsDatabase.Read("Ki", ki[i - 4u])) {
+                        ki[i - 4u] = 0.;
+                    }
+                    if (!signalsDatabase.Read("Kd", kd[i - 4u])) {
+                        kd[i - 4u] = 0.;
+                    }
+                } else {
+                    REPORT_ERROR(ErrorManagement::InitialisationError, "Please define Kp in Pwm signal %d", i);
+                }
                 signalsDatabase.MoveToAncestor(1u);
             }
             TypeDescriptor td = GetSignalType(OutputSignals, i);
@@ -269,7 +266,8 @@ bool MotorControlGAM::Setup() {
         endSwitchOut = (uint32*) (outputSignalsMemoryIndexer[0]);
         directionMask = (uint32*) (outputSignalsMemoryIndexer[1]);
         output = (float32*) (outputSignalsMemoryIndexer[2]);
-        pwm = (uint32*) (outputSignalsMemoryIndexer[3]);
+        position = (int32*) (outputSignalsMemoryIndexer[3]);
+        pwm = (uint32*) (outputSignalsMemoryIndexer[4]);
     }
 
     return ret;
@@ -294,15 +292,20 @@ bool MotorControlGAM::Execute() {
             *endSwitchOut |= (((uint8) isSwitch2) << (2 * i + 1));
         }
         bool isSwitch = (isSwitch1 || isSwitch2);
+        position[i] = measure[i];
 
         int32 error = (reference[i] - measure[i]);
+        float32 curOutput = output[i];
 
-        output[i] = (kp * (float32)(error));
+        output[i] = (kp[i] * (float32)(error));
 
         if (timestamp_1 > 0ull) {
             float32 dError = ((float32)(error - error_1[i])) / dt;
-            iError[i] += (error_1[i] * dt);
-            output[i] += (ki * iError[i]) + (kd * dError);
+            //accumulate if not moving
+            if (error == error_1[i]) {
+                iError[i] += (error_1[i] * dt);
+            }
+            output[i] += (ki[i] * iError[i]) + (kd[i] * dError);
         }
 
         if (output[i] > outMax) {
@@ -312,8 +315,10 @@ bool MotorControlGAM::Execute() {
         }
 
         if ((error < deadBand) && (error > (-deadBand))) {
-            output[i] = 0u;
+            output[i] = 0.;
+            iError[i] = 0;
         }
+
         //if switch and keep same direction, hold on
         if (isSwitch && (error != 0)) {
             if (errorAtSwitch[i] == 0) {

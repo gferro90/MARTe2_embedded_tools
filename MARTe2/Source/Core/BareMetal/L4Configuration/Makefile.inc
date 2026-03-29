@@ -55,7 +55,6 @@ OBJSX=	AnyObject.x \
 		ConfigurationParserI.x \
 		FloatToInteger.x \
 		IntegerToFloat.x \
-		IntrospectionStructure.x \
 		LexicalAnalyzer.x \
 		StringToFloat.x \
 		StringToInteger.x \
