@@ -30,6 +30,10 @@ GpioDataSource::GpioDataSource() :
     //Initialisation already done by the tool !!!
     for (uint32 i = 0u; i < 10u; i++) {
         gpioHandlePtr[i] = NULL;
+        inputMask[i] = 0xFFFFu;
+        outputMask[i] = 0xFFFFu;
+        setMask[i] = 0u;
+        resetMask[i] = 0u;
     }
     numberOfInputs = 0u;
 }
@@ -54,17 +58,14 @@ bool GpioDataSource::Synchronise() {
 
     for (uint32 i = 0u; i < numberOfSignals; i++) {
         if (i < numberOfInputs) {
-            ((uint32*) memory)[i] = gpioHandlePtr[i]->IDR;
+            ((uint32*) memory)[i] = ((gpioHandlePtr[i]->IDR) & (inputMask[i]));
         } else {
             uint32 mask = ((uint32*) memory)[i];
 
             //reset first
-            uint32 odr = gpioHandlePtr[i]->ODR;
-            gpioHandlePtr[i]->BSRR = (odr << 16u);
-
-            if (IS_GPIO_PIN(mask)) {
-                gpioHandlePtr[i]->BSRR = mask;
-            }
+            uint32 odr = (((gpioHandlePtr[i]->ODR) & (~(setMask[i]))) | (resetMask[i]));
+            gpioHandlePtr[i]->BSRR = ((odr << 16u) & 0xFFFF0000);
+            gpioHandlePtr[i]->BSRR = (((((uint16)mask) & outputMask[i]) | setMask[i]) & (~(resetMask[i])) & (0xFFFF));
 
         }
     }
@@ -104,6 +105,39 @@ bool GpioDataSource::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
                 }
             }
         }
+    }
+    if(ret){
+        ret = signalsDatabase.MoveAbsolute("Signals");
+        if(ret){
+            for (uint32 i = 0u; i < numberOfSignals; i++) {
+                if(signalsDatabase.MoveToChild(i)){
+                    if(i<numberOfInputs){
+                        if(!signalsDatabase.Read("InputMask", inputMask[i])){
+                            inputMask[i] = 0xFFFFu;
+                        }
+                        //REPORT_ERROR(ErrorManagement::Information, "InputMask=%0x", inputMask[i]);
+                    }
+                    else{
+                        if(!signalsDatabase.Read("OutputMask", outputMask[i])){
+                            outputMask[i] = 0xFFFFu;
+                        }
+                        if(!signalsDatabase.Read("SetMask", setMask[i])){
+                            setMask[i] = 0u;
+                        }
+                        if(!signalsDatabase.Read("ResetMask", resetMask[i])){
+                            resetMask[i] = 0u;
+                        }
+                        //REPORT_ERROR(ErrorManagement::Information, "OutputMask=%0x", outputMask[i]);
+                        //REPORT_ERROR(ErrorManagement::Information, "SetMask=%0x", setMask[i]);
+                        //REPORT_ERROR(ErrorManagement::Information, "ReetMask=%0x", resetMask[i]);
+
+                    }
+                    signalsDatabase.MoveToAncestor(1u);
+                }
+            }
+            signalsDatabase.MoveToAncestor(1u);
+        }
+
     }
 
     return ret;

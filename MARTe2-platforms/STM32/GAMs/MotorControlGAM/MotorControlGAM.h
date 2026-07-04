@@ -118,6 +118,8 @@ private:
     int32 deadBand;
 
     int8 *errorAtSwitch;
+
+    uint8 numberOfDirSignals;
 };
 
 /*---------------------------------------------------------------------------*/

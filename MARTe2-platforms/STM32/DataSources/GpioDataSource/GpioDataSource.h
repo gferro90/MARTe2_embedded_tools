@@ -88,6 +88,14 @@ private:
      */
     GPIO_TypeDef *gpioHandlePtr[10];
 
+    uint16 inputMask[10];
+
+    uint16 outputMask[10];
+
+    uint16 setMask[10];
+
+    uint16 resetMask[10];
+
     uint32 numberOfInputs;
 
 };

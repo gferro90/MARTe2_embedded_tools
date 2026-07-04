@@ -75,6 +75,7 @@ MotorControlGAM::MotorControlGAM() :
 
     deadBand = 0;
     errorAtSwitch = NULL;
+    numberOfDirSignals = 0u;
 }
 
 MotorControlGAM::~MotorControlGAM() {
@@ -122,6 +123,10 @@ bool MotorControlGAM::Initialise(StructuredDataI &data) {
             pwmMax = 1000u;
             REPORT_ERROR(ErrorManagement::Warning, "MaxPwm not defined. Set to %d", pwmMax);
         }
+        if (!data.Read("NumDirSignals", numberOfDirSignals)) {
+            numberOfDirSignals = 1u;
+            REPORT_ERROR(ErrorManagement::Warning, "NumDirSignals not defined. Set to %d", numberOfDirSignals);
+        }
     }
 
     return ret;
@@ -130,7 +135,7 @@ bool MotorControlGAM::Initialise(StructuredDataI &data) {
 bool MotorControlGAM::Setup() {
     bool ret = true;
     if (ret) {
-        GetSignalNumberOfElements(OutputSignals, 2u, numberOfMotors);
+        GetSignalNumberOfElements(OutputSignals, numberOfDirSignals + 1u, numberOfMotors);
 
         iError = new float32[numberOfMotors];
         error_1 = new int32[numberOfMotors];
@@ -189,20 +194,39 @@ bool MotorControlGAM::Setup() {
         }
     }
     if (ret) {
-        TypeDescriptor td = GetSignalType(OutputSignals, 1u);
-        ret = (td == UnsignedInteger32Bit);
-        if (ret) {
-            ret = signalsDatabase.MoveAbsolute("OutputSignals");
+        uint8 readPins = 0u;
+        for (uint8 i = 0u; (i < numberOfDirSignals) && ret; i++) {
+            TypeDescriptor td = GetSignalType(OutputSignals, i + 1u);
+            ret = (td == UnsignedInteger32Bit);
             if (ret) {
-                Vector<uint8> directioPinVec(directionPin, numberOfMotors);
-                signalsDatabase.MoveToChild(1u);
-                ret = signalsDatabase.Read("DirectionPins", directioPinVec);
-                if (!ret) {
-                    REPORT_ERROR(ErrorManagement::FatalError, "Unable to read DirectionPins");
+                ret = signalsDatabase.MoveAbsolute("OutputSignals");
+                if (ret) {
+                    ret = signalsDatabase.MoveToChild(i + 1u);
+                    if (ret) {
+                        AnyType at = signalsDatabase.GetType("DirectionPins");
+                        ret = !at.IsVoid();
+                        if (ret) {
+                            uint32 nElementsPins = at.GetNumberOfElements(0u);
+                            Vector<uint8> directioPinVec(&directionPin[readPins], nElementsPins);
+                            ret = signalsDatabase.Read("DirectionPins", directioPinVec);
+                            if (ret) {
+                                for (uint8 j = 0u; j < nElementsPins; j++) {
+                                    directionPin[j + readPins] += (i * 32u);
+                                }
+                                readPins += nElementsPins;
+                            } else {
+                                REPORT_ERROR(ErrorManagement::FatalError, "Unable to read DirectionPins");
+                            }
+                        } else {
+                            REPORT_ERROR(ErrorManagement::FatalError, "Unable to read DirectionPins");
+                        }
+                    } else {
+                        REPORT_ERROR(ErrorManagement::FatalError, "Unable to move to direction pin signal %d", i + 1u);
+                    }
                 }
+            } else {
+                REPORT_ERROR(ErrorManagement::FatalError, "The type of output signal %d must be uint32", i + 1u);
             }
-        } else {
-            REPORT_ERROR(ErrorManagement::FatalError, "The type of output signal 1 must be uint32");
         }
         if (ret) {
             ret = signalsDatabase.MoveAbsolute("InputSignals");
@@ -216,22 +240,24 @@ bool MotorControlGAM::Setup() {
             }
         }
         if (ret) {
-            TypeDescriptor td = GetSignalType(OutputSignals, 2u);
+            uint32 outputsIdx = 1u + numberOfDirSignals;
+            TypeDescriptor td = GetSignalType(OutputSignals, outputsIdx);
             ret = (td == Float32Bit);
             if (!ret) {
-                REPORT_ERROR(ErrorManagement::FatalError, "The type of output signal 2 must be float32");
+                REPORT_ERROR(ErrorManagement::FatalError, "The type of output signal %d must be float32", outputsIdx);
             }
         }
         if (ret) {
-            TypeDescriptor td = GetSignalType(OutputSignals, 3u);
+            uint32 positionsIdx = 2u + numberOfDirSignals;
+            TypeDescriptor td = GetSignalType(OutputSignals, positionsIdx);
             ret = (td == SignedInteger32Bit);
             if (!ret) {
-                REPORT_ERROR(ErrorManagement::FatalError, "The type of output signal 3 must be int32");
+                REPORT_ERROR(ErrorManagement::FatalError, "The type of output signal %d must be int32", positionsIdx);
             }
         }
         if (ret) {
             uint32 numberOfMeasures = 0u;
-            GetSignalNumberOfElements(OutputSignals, 3u, numberOfMeasures);
+            GetSignalNumberOfElements(OutputSignals, 2u + numberOfDirSignals, numberOfMeasures);
 
             ret = (numberOfMotors == numberOfMeasures);
             if (!ret) {
@@ -239,16 +265,18 @@ bool MotorControlGAM::Setup() {
             }
         }
         signalsDatabase.MoveAbsolute("OutputSignals");
-        for (uint32 i = 4u; (i < numberOfOutputSignals) && ret; i++) {
+        uint32 pwmStartIndex = (3u + numberOfDirSignals);
+        for (uint32 i = pwmStartIndex; (i < numberOfOutputSignals) && ret; i++) {
+            uint32 pwmIdx=(i-pwmStartIndex);
             if (signalsDatabase.MoveToChild(i)) {
-                signalsDatabase.Read("PwmMin", pwmMin[i - 4u]);
-                ret = signalsDatabase.Read("Kp", kp[i - 4u]);
+                signalsDatabase.Read("PwmMin", pwmMin[pwmIdx]);
+                ret = signalsDatabase.Read("Kp", kp[pwmIdx]);
                 if (ret) {
-                    if (!signalsDatabase.Read("Ki", ki[i - 4u])) {
-                        ki[i - 4u] = 0.;
+                    if (!signalsDatabase.Read("Ki", ki[pwmIdx])) {
+                        ki[pwmIdx] = 0.;
                     }
-                    if (!signalsDatabase.Read("Kd", kd[i - 4u])) {
-                        kd[i - 4u] = 0.;
+                    if (!signalsDatabase.Read("Kd", kd[pwmIdx])) {
+                        kd[pwmIdx] = 0.;
                     }
                 } else {
                     REPORT_ERROR(ErrorManagement::InitialisationError, "Please define Kp in Pwm signal %d", i);
@@ -265,9 +293,9 @@ bool MotorControlGAM::Setup() {
     if (ret) {
         endSwitchOut = (uint32*) (outputSignalsMemoryIndexer[0]);
         directionMask = (uint32*) (outputSignalsMemoryIndexer[1]);
-        output = (float32*) (outputSignalsMemoryIndexer[2]);
-        position = (int32*) (outputSignalsMemoryIndexer[3]);
-        pwm = (uint32*) (outputSignalsMemoryIndexer[4]);
+        output = (float32*) (outputSignalsMemoryIndexer[numberOfDirSignals + 1]);
+        position = (int32*) (outputSignalsMemoryIndexer[numberOfDirSignals + 2]);
+        pwm = (uint32*) (outputSignalsMemoryIndexer[numberOfDirSignals + 3]);
     }
 
     return ret;
@@ -279,7 +307,9 @@ bool MotorControlGAM::Execute() {
     if (timestamp_1 > 0ull) {
         dt = (float32)((*timestampUs - timestamp_1) / 1000000.0);
     }
-    *directionMask = 0u;
+    for (uint8 i = 0u; i < numberOfDirSignals; i++) {
+        directionMask[i] = 0u;
+    }
     *endSwitchOut = 0u;
 
     for (uint32 i = 0; i < numberOfMotors; i++) {
@@ -294,10 +324,13 @@ bool MotorControlGAM::Execute() {
         bool isSwitch = (isSwitch1 || isSwitch2);
         position[i] = measure[i];
 
+        //REPORT_ERROR(ErrorManagement::Information, "%d: reference=%d, measure=%d", i, reference[i], measure[i]);
+
         int32 error = (reference[i] - measure[i]);
         float32 curOutput = output[i];
 
         output[i] = (kp[i] * (float32)(error));
+        //REPORT_ERROR(ErrorManagement::Information, "%d: Step1 output=%f, kp=%f, ki=%f, kd=%f", i, output[i], kp[i], ki[i], kd[i]);
 
         if (timestamp_1 > 0ull) {
             float32 dError = ((float32)(error - error_1[i])) / dt;
@@ -307,6 +340,7 @@ bool MotorControlGAM::Execute() {
             }
             output[i] += (ki[i] * iError[i]) + (kd[i] * dError);
         }
+        //REPORT_ERROR(ErrorManagement::Information, "%d: Step2 output=%f", i, output[i]);
 
         if (output[i] > outMax) {
             output[i] = outMax;
@@ -318,6 +352,7 @@ bool MotorControlGAM::Execute() {
             output[i] = 0.;
             iError[i] = 0;
         }
+        //REPORT_ERROR(ErrorManagement::Information, "%d: Step3 output=%f", i, output[i]);
 
         //if switch and keep same direction, hold on
         if (isSwitch && (error != 0)) {
@@ -331,6 +366,7 @@ bool MotorControlGAM::Execute() {
         } else {
             errorAtSwitch[i] = 0;
         }
+        //REPORT_ERROR(ErrorManagement::Information, "%d: Step4 output=%f", i, output[i]);
 
         if (output[i] > 0) {
             pwm[i] = (uint32)((output[i] * pwmMax) / outMax);
@@ -344,12 +380,17 @@ bool MotorControlGAM::Execute() {
                 pwm[i] = (pwmMax - pwmMin[i]);
             }
             //set gpio
-            *directionMask |= (1 << (directionPin[i]));
+            uint8 dirIdx = (directionPin[i] / 32);
+            uint8 dirPin = (directionPin[i] % 32);
+            directionMask[dirIdx] |= (1 << dirPin);
         } else {
             //set voltage to both motor terminals
             pwm[i] = pwmMax;
-            *directionMask |= (1 << (directionPin[i]));
+            uint8 dirIdx = (directionPin[i] / 32);
+            uint8 dirPin = (directionPin[i] % 32);
+            directionMask[dirIdx] |= (1 << dirPin);
         }
+        //REPORT_ERROR(ErrorManagement::Information, "%d: Step5 output=%f", i, output[i]);
 
         error_1[i] = error;
         //REPORT_ERROR(ErrorManagement::Information, "%d: error=%d, pwm=%d, output=%f", i, error, pwm[i], output[i]);

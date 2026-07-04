@@ -107,12 +107,21 @@ bool LS7366RDataSource::Initialise(StructuredDataI &data) {
             invert = 0u;
             REPORT_ERROR(ErrorManagement::Information, "Invert not defined. Set to default %d", invert);
         }
+        uint16 otherPinMask = 0u;
+        if (!data.Read("SharedPinMask", otherPinMask)) {
+            otherPinMask = (1 << selectorPin);
+        }
+        gpioSelector->BSRR = otherPinMask;
+
+
     }
 
     return ret;
 }
 
 bool LS7366RDataSource::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
+
+
     bool ret = DataSourceI::SetConfiguredDatabase(data);
     if (ret) {
         ret = (numberOfSignals == 2u);
@@ -127,7 +136,7 @@ bool LS7366RDataSource::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
         }
     }
     if (ret) {
-        ret = (GetSignalType(0u) == SignedInteger32Bit);
+        ret = (GetSignalType(1u) == SignedInteger32Bit);
         if (!ret) {
             REPORT_ERROR(ErrorManagement::InitialisationError, "The LS7366RDataSource counter signal type must be int32");
         }
@@ -146,19 +155,111 @@ bool LS7366RDataSource::SetConfiguredDatabase(MARTe::StructuredDataI &data) {
         }
     }
     if (ret) {
-        if (gpioSelector != NULL) {
-            HAL_GPIO_WritePin(gpioSelector, (1<<selectorPin), GPIO_PIN_RESET);
+        uint8 tx[2] = { 0, 0 };
+        uint8 rx[2] = { 0, 0 };
+
+        {
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
+
+            tx[0] = (READ | MDR0_REG);
+            tx[1] = 0;
+            rx[0] = 0;
+            rx[1] = 0;
+
+            HAL_SPI_TransmitReceive(spiHandle, tx, rx, 2, HAL_MAX_DELAY);
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
         }
+        {
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
 
-        uint8 tx[] = {WRITE | MDR0_REG, X4};
-        HAL_SPI_Transmit(spiHandle, tx , 2, HAL_MAX_DELAY);
+            tx[0] = (CLEAR | STR_REG);
+            HAL_SPI_Transmit(spiHandle, tx, 1, HAL_MAX_DELAY);
 
-        tx[0] = (WRITE | MDR1_REG);
-        tx[1] = TIMER_U32;
-        HAL_SPI_Transmit(spiHandle, tx , 2, HAL_MAX_DELAY);
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
+        }
+        {
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
 
-        if(gpioSelector != NULL) {
-            HAL_GPIO_WritePin(gpioSelector, (1<<selectorPin), GPIO_PIN_SET);
+            tx[0] = (CLEAR | CNTR_REG);
+            HAL_SPI_Transmit(spiHandle, tx, 1, HAL_MAX_DELAY);
+
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
+        }
+        {
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
+
+            tx[0] = (CLEAR | MDR0_REG);
+            HAL_SPI_Transmit(spiHandle, tx, 1, HAL_MAX_DELAY);
+
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
+        }
+        {
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
+
+            tx[0] = (CLEAR | MDR1_REG);
+            HAL_SPI_Transmit(spiHandle, tx, 1, HAL_MAX_DELAY);
+
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
+        }
+        {
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
+
+            tx[0] = (WRITE | MDR0_REG);
+            tx[1] = X4;
+            rx[0] = 0;
+            rx[0] = 0;
+
+            HAL_SPI_Transmit(spiHandle, tx, 2, HAL_MAX_DELAY);
+
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
+        }
+        {
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
+
+            tx[0] = (WRITE | MDR1_REG);
+            tx[1] = TIMER_U32;
+            rx[0] = 0;
+            rx[0] = 0;
+
+            HAL_SPI_Transmit(spiHandle, tx, 2, HAL_MAX_DELAY);
+
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
+        }
+        {
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
+
+            tx[0] = (READ | MDR0_REG);
+            tx[1] = 0;
+            rx[0] = 0;
+            rx[1] = 0;
+
+            HAL_SPI_TransmitReceive(spiHandle, tx, rx, 2, HAL_MAX_DELAY);
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
+            REPORT_ERROR(ErrorManagement::Information, "MDR0 readback is %0x", rx[1]);
+        }
+        {
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
+
+            tx[0] = (READ | MDR1_REG);
+            tx[1] = 0;
+            rx[0] = 0;
+            rx[1] = 0;
+
+            HAL_SPI_TransmitReceive(spiHandle, tx, rx, 2, HAL_MAX_DELAY);
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
+            REPORT_ERROR(ErrorManagement::Information, "MDR1 readback is %0x", rx[1]);
+        }
+        {
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
+
+            tx[0] = (READ | STR_REG);
+            tx[1] = 0;
+            rx[0] = 0;
+            rx[1] = 0;
+
+            HAL_SPI_TransmitReceive(spiHandle, tx, rx, 2, HAL_MAX_DELAY);
+            HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
+            REPORT_ERROR(ErrorManagement::Information, "STR readback is %0x", rx[1]);
         }
     }
 
@@ -177,33 +278,51 @@ bool LS7366RDataSource::GetSignalMemoryBuffer(const uint32 signalIdx, const uint
     return ret;
 }
 
-bool LS7366RDataSource::AllocateMemory(){
+bool LS7366RDataSource::AllocateMemory() {
     return true;
 }
 
-
 bool LS7366RDataSource::Synchronise() {
+
+    uint8 tx[5] = { 0, 0, 0, 0, 0 };
+    uint8 rx[5] = { 0, 0, 0, 0, 0 };
+
+
     //first signal is reset
-    if (gpioSelector != NULL) {
-        HAL_GPIO_WritePin(gpioSelector, (1<<selectorPin), GPIO_PIN_RESET);
+    if (reset > 0u) {
+        HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
+
+        tx[0] = (CLEAR | CNTR_REG);
+        HAL_SPI_Transmit(spiHandle, tx, 1, HAL_MAX_DELAY);
+
+        HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
+
     }
-    if(reset > 0u) {
-        uint8 tx = (CLEAR | CNTR_REG);
-        HAL_SPI_Transmit(spiHandle, &tx , 1, HAL_MAX_DELAY);
+    {
+        HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
+
+        tx[0] = (READ | CNTR_REG);
+        tx[1] = 0;
+        tx[2] = 0;
+        tx[3] = 0;
+        tx[4] = 0;
+
+        rx[0] = 0;
+        rx[1] = 0;
+        rx[2] = 0;
+        rx[3] = 0;
+        rx[4] = 0;
+
+        HAL_SPI_TransmitReceive(spiHandle, tx, rx, 5, HAL_MAX_DELAY);
+
+        HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
+
     }
 
-    uint8 tx = READ | CNTR_REG;
-    uint8 rx[4];
+    counter = (rx[1] << 24) | (rx[2] << 16) | (rx[3] << 8) | (rx[4]);
+    //REPORT_ERROR(ErrorManagement::Information, "counter = %d", counter);
 
-    HAL_SPI_Transmit(spiHandle, &tx , 1, HAL_MAX_DELAY);
-    HAL_SPI_Receive(spiHandle, rx , 4, HAL_MAX_DELAY);
-
-    if(gpioSelector != NULL) {
-        HAL_GPIO_WritePin(gpioSelector, (1<<selectorPin), GPIO_PIN_SET);
-    }
-
-    counter = (rx[0]<<24)|(rx[1]<<16)|(rx[2]<<8)|(rx[3]);
-    if(invert) {
+    if (invert) {
         counter *= -1;
     }
 
@@ -222,13 +341,25 @@ const char8* LS7366RDataSource::GetBrokerName(StructuredDataI &data, const Signa
 
 bool LS7366RDataSource::PrepareNextState(const MARTe::char8 *const currentStateName, const MARTe::char8 *const nextStateName) {
     counter = 0;
-    if (gpioSelector != NULL) {
-        HAL_GPIO_WritePin(gpioSelector, (1<<selectorPin), GPIO_PIN_RESET);
+    uint8 tx[2] = { 0, 0 };
+    uint8 rx[2] = { 0, 0 };
+    {
+        HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
+
+        tx[0] = (CLEAR | CNTR_REG);
+        HAL_SPI_Transmit(spiHandle, tx, 1, HAL_MAX_DELAY);
+
+        HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
     }
-    uint8 tx = (CLEAR | CNTR_REG);
-    HAL_SPI_Transmit(spiHandle, &tx, 1, HAL_MAX_DELAY);
-    if (gpioSelector != NULL) {
-        HAL_GPIO_WritePin(gpioSelector, (1<<selectorPin), GPIO_PIN_SET);
+    {
+        HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_RESET);
+
+        tx[0] = (WRITE | MDR1_REG);
+        tx[1] = ENABLE;
+
+        HAL_SPI_Transmit(spiHandle, tx, 2, HAL_MAX_DELAY);
+
+        HAL_GPIO_WritePin(gpioSelector, (1 << selectorPin), GPIO_PIN_SET);
     }
 
     return true;
