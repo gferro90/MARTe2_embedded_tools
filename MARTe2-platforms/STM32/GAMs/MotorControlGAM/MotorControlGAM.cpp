@@ -335,7 +335,7 @@ bool MotorControlGAM::Execute() {
         if (timestamp_1 > 0ull) {
             float32 dError = ((float32)(error - error_1[i])) / dt;
             //accumulate if not moving
-            if (error == error_1[i]) {
+            if ((error == error_1[i]) && (!isSwitch)) {
                 iError[i] += (error_1[i] * dt);
             }
             output[i] += (ki[i] * iError[i]) + (kd[i] * dError);
