@@ -15,5 +15,11 @@ for lib in ${MARTe2_extensions_LIBS}; do
     echo $lib
     export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$(dirname ${lib})
 done
+THIS_DIR=../../../../../../Components/
+THIS_LIBS=$(find ${THIS_DIR}/Build -name "*.so")
+for lib in ${THIS_LIBS}; do
+    echo $lib
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$(dirname $(readlink -f ${lib}))
+done
 echo $LD_LIBRARY_PATH
 ${MARTe2_DIR}/Build/x86-linux/App/MARTeApp.ex -l RealTimeLoader -f $1 -m StateMachine:START 

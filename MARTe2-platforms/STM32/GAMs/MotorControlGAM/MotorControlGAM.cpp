@@ -74,7 +74,6 @@ MotorControlGAM::MotorControlGAM() :
     pwmMax = 1000u;
 
     deadBand = 0;
-    errorAtSwitch = NULL;
     numberOfDirSignals = 0u;
 }
 
@@ -92,9 +91,6 @@ MotorControlGAM::~MotorControlGAM() {
         delete[] error_1;
     }
     if (iError != NULL) {
-        delete[] iError;
-    }
-    if (errorAtSwitch != NULL) {
         delete[] iError;
     }
     if (kp != NULL) {
@@ -142,7 +138,6 @@ bool MotorControlGAM::Setup() {
         directionPin = new uint8[numberOfMotors];
         endSwitchPin = new uint8[2 * numberOfMotors];
         pwmMin = new uint32[numberOfMotors];
-        errorAtSwitch = new int8[numberOfMotors];
         kp = new float32[numberOfMotors];
         ki = new float32[numberOfMotors];
         kd = new float32[numberOfMotors];
@@ -171,7 +166,6 @@ bool MotorControlGAM::Setup() {
         for (uint32 i = 0u; (i < numberOfMotors) && ret; i++) {
             iError[i] = 0.;
             error_1[i] = 0;
-            errorAtSwitch = 0;
         }
     }
     if (ret) {
@@ -355,17 +349,13 @@ bool MotorControlGAM::Execute() {
         //REPORT_ERROR(ErrorManagement::Information, "%d: Step3 output=%f", i, output[i]);
 
         //if switch and keep same direction, hold on
-        if (isSwitch && (error != 0)) {
-            if (errorAtSwitch[i] == 0) {
-                //save error at switch
-                errorAtSwitch[i] = (error > 0) ? (1) : (-1);
-            }
-            if ((errorAtSwitch[i] * error) > 0) {
-                output[i] = 0u;
-            }
-        } else {
-            errorAtSwitch[i] = 0;
+        if (isSwitch1 && (error > 0)) {
+            output[i] = 0u;
         }
+        if (isSwitch2 && (error < 0)) {
+            output[i] = 0u;
+        }
+
         //REPORT_ERROR(ErrorManagement::Information, "%d: Step4 output=%f", i, output[i]);
 
         if (output[i] > 0) {
