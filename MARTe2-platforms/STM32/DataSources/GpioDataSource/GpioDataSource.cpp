@@ -63,9 +63,9 @@ bool GpioDataSource::Synchronise() {
             uint32 mask = ((uint32*) memory)[i];
 
             //reset first
-            uint32 odr = (((gpioHandlePtr[i]->ODR) & (~(setMask[i]))) | (resetMask[i]));
-            gpioHandlePtr[i]->BSRR = ((odr << 16u) & 0xFFFF0000);
-            gpioHandlePtr[i]->BSRR = (((((uint16)mask) & outputMask[i]) | setMask[i]) & (~(resetMask[i])) & (0xFFFF));
+            uint32 low = (((((uint16)mask) & outputMask[i]) | setMask[i]) & (~(resetMask[i])) & (0xFFFF));
+            uint32 high = (((~low) << 16u) & 0xFFFF0000);
+            gpioHandlePtr[i]->BSRR = high+low;
 
         }
     }

@@ -84,7 +84,7 @@ bool PwmDataSource::Synchronise() {
     uint32 *dutyCycles = (uint32*) memory;
 
     for (uint32 i = 0u; i < numberOfSignals; i++) {
-        uint32 dutyCyclesT = (dutyCycles[i] * 1000u) / period;
+        uint32 dutyCyclesT = (dutyCycles[i] * period) / 1000u;
 
         if (dutyCyclesT > (period - 1u)) {
             dutyCyclesT = (period - 1u);
